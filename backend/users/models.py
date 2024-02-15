@@ -1,28 +1,122 @@
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils import timezone
+from django.db.models.functions import Length
 from django.utils.translation import gettext_lazy as _
 
-from users.managers import FoodUserManager
+from reviews import texts, validators
+from reviews.enums import Limits
+
+models.CharField.register_lookup(Length)
 
 
-class FoodUser(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(_("email address"), unique=True)
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    date_joined = models.DateTimeField(default=timezone.now)
-    name  = models.CharField('Имя', max_length=50)
-    last_name = models.CharField('Фамилия', max_length=50)
-    role = models.CharField()
-    subs = models.ForeignKey('User', on_delete=models.CASCADE)
-    favorites =  models.ManyToManyField('Recipe',
-                                          through='FavoritesUser')
-    shopping_list = models.ManyToManyField('RecipeIngredient',
-                                          through='RecipeIngredientUser')
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+class FoodUser(AbstractUser):
+    """
+    Модель пользователя.
+    При создании пользователя все поля обязательны для заполнения.
+    """
+    email = models.EmailField(
+        verbose_name='Адрес электронной почты',
+        max_length=Limits.MAX_LEN_EMAIL.value,
+        unique=True,
+        help_text=texts.USER_HELP_EMAIL,
+    )
+    username = models.CharField(
+        verbose_name='Уникальный юзернейм',
+        max_length=Limits.MAX_LEN_USERNAME.value,
+        unique=True,
+        help_text=texts.USER_HELP_USERNAME,
+        # validators=(
+        #     validators.MinLenValidator(
+        #         field='username',
+        #     ),
+        #     validators.OneOfTwoValidator(field='username'),
+        # ),
+    )
+    first_name = models.CharField(
+        verbose_name='Имя',
+        max_length=Limits.MAX_LEN_FIRST_NAME.value,
+        help_text=texts.USER_HELP_F_NAME,
+        # validators=(
+        #     validators.OneOfTwoValidator(
+        #         first_regex='[^а-яёА-ЯЁ -]+',
+        #         second_regex='[^a-zA-Z -]+',
+        #         field='Имя',
+        #     ),
+        # ),
+    )
+    last_name = models.CharField(
+        verbose_name='Фамилия',
+        max_length=Limits.MAX_LEN_LAST_NAME.value,
+        help_text=texts.USER_HELP_L_NAME,
+        # validators=(
+        #     validators.OneOfTwoValidator(
+        #         first_regex='[^а-яёА-ЯЁ -]+',
+        #         second_regex='[^a-zA-Z -]+',
+        #         field='Фамилия',
+        #     ),
+        # ),
+    )
+    password = models.CharField(
+        verbose_name=_('Пароль'),
+        max_length=128,
+        help_text=texts.USER_HELP_PASSWORD,
+    )
+    is_active = models.BooleanField(
+        verbose_name='Активирован',
+        default=True,
+    )
 
-    objects = FoodUserManager()
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
+        ordering = ('username',)
+        constraints = (
+            models.CheckConstraint(
+                check=models.Q(username__length__gte=Limits.DEF_MIN_LEN.value),
+                name='User',
+            ),
+        )
+        
+    def __str__(self) -> str:
+        return '%d: %s' % (self.email, self.username)
 
-    def __str__(self):
-        return self.email
+
+class Subscriptions(models.Model):
+    """Подписки пользователей друг на друга."""
+    user = models.ForeignKey(
+        'FoodUser',
+        verbose_name='Подписчик',
+        related_name='follower',
+        on_delete=models.CASCADE,
+    )
+
+    author = models.ForeignKey(
+        'FoodUser',
+        verbose_name='Автор рецепта',
+        related_name='publisher',
+        on_delete=models.CASCADE,
+    )
+
+    date_added = models.DateTimeField(
+        verbose_name='Дата создания подписки',
+        auto_now_add=True,
+        editable=False,
+    )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        models.constraints = (
+            models.UniqueConstraint(
+                fields=('author', 'user'),
+                name='Signed',
+            ),
+            models.CheckConstraint(
+                check=~models.Q(author=models.F('user')),
+                name='No self sibscription'
+            ),
+        )
+
+    def __str__(self) -> str:
+        return f'{self.user.username} подписан {self.author.username}'
+        
