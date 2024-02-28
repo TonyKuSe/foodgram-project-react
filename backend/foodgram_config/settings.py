@@ -1,6 +1,6 @@
 from pathlib import Path
-
-from decouple import config
+import os
+# from decouple import config
 
 
 DATE_TIME_FORMAT = "%d/%m/%Y %H:%M"
@@ -71,13 +71,13 @@ TEMPLATES = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        # "NAME": config("DB_NAME", default="postgres"),
-        'NAME': 'postgres',
+        # "NAME": os.getenv("DB_NAME", default="postgres"),
+        'NAME': 'test_database',
         'USER': 'postgres',
-        # "USER": config("POSTGRES_USER", default="postgres"),
-        "PASSWORD": config("POSTGRES_PASSWORD", default="postgres"),
-        "HOST": config("DB_HOST", default=''),
-        "PORT": config("DB_PORT", default=5432),
+        # "USER": os.getenv("POSTGRES_USER", default="postgres"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="postgres"),
+        "HOST": os.getenv("DB_HOST", default=''),
+        "PORT": os.getenv("DB_PORT", default=5432),
     }
 }
 
@@ -106,6 +106,11 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    
     'DEFAULT_PERMISSION_CLASSES': [
         # "rest_framework.permissions.IsAuthenticatedOrReadOnly",
         'rest_framework.permissions.IsAuthenticated',
@@ -115,20 +120,21 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    # 'PAGE_SIZE': 2,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 2,
 }
 
 DJOSER = {
     "LOGIN_FIELD": "email",
     "HIDE_USERS": False,
-    # "PERMISSIONS": {
-    #     "resipe": ("foodgram_api.permissions.AuthorStaffOrReadOnly,",),
-    #     "recipe_list": ("foodgram_api.permissions.AuthorStaffOrReadOnly",),
-    #     "user": ("foodgram_api.permissions.OwnerUserOrReadOnly",),
-    #     'user_list': ("foodgram_api.permissions.OwnerUserOrReadOnly",),
-    #     'subscribe': ("foodgram_api.permissions.OwnerUserOrReadOnly",)
-    # },
+    "PERMISSIONS": {
+        "resipe": ("foodgram_api.permissions.IsAuthenticated,",),
+        "recipe_list": ("foodgram_api.permissions.AuthorStaffOrReadOnly",),
+        "user": ("foodgram_api.permissions.OwnerUserOrReadOnly",),
+        'user_list': ("foodgram_api.permissions.OwnerUserOrReadOnly",),
+        'subscribe': ("foodgram_api.permissions.OwnerUserOrReadOnly",),
+        'shopping_cart': ("foodgram_api.permissions.IsAuthenticated,",)
+    },
     # "SERIALIZERS": {
     #     'user': 'users.serializers.UserSerializer',
     #     'current_user': 'users.serializers.UserMeSerializer',

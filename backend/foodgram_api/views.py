@@ -1,4 +1,10 @@
 from http import HTTPMethod
+from datetime import datetime
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.core.mail import send_mail
+from django.db.models.aggregates import Count, Sum
+
 from django.contrib.auth import get_user_model
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
@@ -9,11 +15,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.routers import APIRootView
 from reviews.enums import Tuples, UrlQueries
-from reviews.models import Carts, Favorites, Ingredient, Recipe, Tag
-from reviews.svc import FoodFun
+from reviews.models import Carts, Favorites, Ingredient, Recipe, Tag, RecipeIngredient
 from users.models import Subscriptions
 from django.shortcuts import get_object_or_404
 from foodgram_config import settings
+from rest_framework_simplejwt.tokens import RefreshToken
 # from .mixins import AddDelViewMixin
 from .paginators import PageLimitPagination
 from .permissions import (AdminOrReadOnly, AuthorStaffOrReadOnly,
@@ -21,8 +27,8 @@ from .permissions import (AdminOrReadOnly, AuthorStaffOrReadOnly,
                           AllowAnyMe, OwnerUserOrReadOnly, IsAuthenticated)
 from users.serializers import (UserSubscribeSerializer,
                                UserSerializer, UserRetrieveSerializer, UserSetPasswordSerializer, FollowSerializer)
-from .serializers import (IngredientSerializer, RecipeSerializer,
-                          ShortRecipeSerializer, TagSerializer)
+from .serializers import (IngredientSerializer, RecipeSerializer, RecipeSerializerList, FavoritRecipeSerializer,
+                          CartsRecipeSerializer, TagSerializer)
 from django.views.generic import CreateView
 
 User = get_user_model()
@@ -32,11 +38,6 @@ class UserViewSet(DjoserUserViewSet):
     pagination_class = PageLimitPagination
     permission_classes = ()
     filter_backends = (filters.SearchFilter,)
-
-    # def get_queryset(self):
-    #     if self.action == 'retrieve' and self.request.data is not None:
-    #         return User.objects.filter(id=self.request.data['id'])
-    #     return super().get_queryset()
     
     def get_serializer_class(self):
         if self.action == 'retrieve' and self.request.data is not None:
@@ -58,6 +59,7 @@ class UserViewSet(DjoserUserViewSet):
             pages, many=True,
             context={'request': request})
         return self.get_paginated_response(serializer.data)
+
 
 class CreateDeleteSubscribe(
         generics.RetrieveDestroyAPIView, generics.CreateAPIView):
@@ -89,18 +91,52 @@ class TagViewSet(viewsets.ModelViewSet):
     permission_classes = (AdminOrReadOnly,)
 
 
-class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+class IngredientViewSet(viewsets.ModelViewSet):
     """Работет с игридиентами."""
 
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = (AdminOrReadOnly,)
+    # permission_classes = (AdminOrReadOnly,)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = Ingredient.objects.all()
-    serializer_class = RecipeSerializer
+    queryset = Recipe.objects.all()
+    # permission_classes = (IsAuthenticated,)
+    
+    def get_serializer_class(self):
+        if self.action == 'create' or 'update':
+            if self.basename == 'favorite':
+                return FavoritRecipeSerializer
+            return RecipeSerializer
+        return RecipeSerializerList
     
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user) 
+        serializer.save(author=self.request.user, id=self.kwargs.get('recipe_id'))
+
+    @action(methods=("get",), detail=False)
+    def download_shopping_cart(self, request: WSGIRequest) -> Response:
+        """Загружает файл со списком покупок"""
+        user = self.request.user
+        recipe_list = Carts.objects.all().filter(user=user).values('recipe_id')
+        shopping_list = []
+        for recipe_id in recipe_list:
+            shopping_list.append(RecipeIngredient.objects.all().filter(
+                recipe__id=recipe_id['recipe_id']).values(
+                    'ingredient__name', 'ingredient__measurement_unit').annotate(Sum('amount')))
+        response = HttpResponse(
+            shopping_list, content_type="text.txt; charset=utf-8"
+        )
+        return response
+
+
+
+class ShoppingCartViewSet(viewsets.ModelViewSet):
+    """Вьюсет для работы с моделью Comments."""
+    serializer_class = CartsRecipeSerializer
+    permission_classes = (IsAuthenticated,)
+
+    http_method_names = ('post', 'delete', 'get')
     
+    def perform_create(self, serializer):
+        recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))
+        serializer.save(user=self.request.user, recipe=recipe)

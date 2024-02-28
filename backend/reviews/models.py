@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models.functions import Length
 from PIL import Image
 
+
 from .enums import Limits, Tuples
 
 
@@ -98,12 +99,13 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         'Recipe',
         verbose_name='В каких рецептах',
-        related_name='ingredient',
+        related_name='rec_ingredient',
         on_delete=models.CASCADE,
     )
     ingredient = models.ForeignKey(
         'Ingredient',
         verbose_name='Связанные ингредиенты',
+        related_name='rec_ingredient',
         on_delete=models.CASCADE,
     )
     amount = models.PositiveSmallIntegerField(
@@ -173,7 +175,6 @@ class Favorites(models.Model):
     class Meta:
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
-
 
     def __str__(self) -> str:
         return f"{self.user} -> {self.recipe}"

@@ -7,7 +7,7 @@ from django.db import models
 from django.db.transaction import atomic
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework import serializers
-from reviews import svc
+
 from reviews.models import Ingredient, Recipe, Tag
 from users.models import Subscriptions, FoodUser
 # from reviews.validators import ingredients_validator, tags_exist_validator
