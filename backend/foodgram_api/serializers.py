@@ -7,7 +7,9 @@ from django.db import models
 from django.db.transaction import atomic
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework import serializers
+import base64
 
+from django.core.files.base import ContentFile
 from reviews.models import Ingredient, Recipe, Tag, RecipeIngredient, Favorites, Carts
 from users.models import Subscriptions, FoodUser
 from rest_framework.validators import UniqueTogetherValidator
@@ -17,6 +19,15 @@ from users.serializers import UserSerializer
 
 User = get_user_model()
 
+class Base64ImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+
+            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+
+        return super().to_internal_value(data)
 
 class ShortRecipeSerializer(ModelSerializer):
     """Сериализатор для показа модели Recipe."""
@@ -83,7 +94,9 @@ class RecipeSerializer(ModelSerializer):
     ingredients = Hex2NameColor()
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
-
+    image = Base64ImageField(
+        required=False, allow_null=True
+    )
     class Meta:
         model = Recipe
         fields = (
@@ -94,7 +107,7 @@ class RecipeSerializer(ModelSerializer):
             'is_favorited',
             'is_in_shopping_cart',
             'name',
-             # 'image',
+            'image',
             'text',
             'cooking_time',
         )
@@ -133,7 +146,7 @@ class RecipeSerializer(ModelSerializer):
 class RecipeSerializerList(ModelSerializer):
     """Сериализатор для рецептов."""
     author = UserSerializer(many=False)
-    # tags = TagSerializer(many=True)
+    tags = TagSerializer(many=True)
     ingredients = Hex2NameColor()
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
@@ -148,7 +161,7 @@ class RecipeSerializerList(ModelSerializer):
             'is_favorited',
             'is_in_shopping_cart',
             'name',
-            # 'image',
+            'image',
             'text',
             'cooking_time',
         )
@@ -160,7 +173,7 @@ class RecipeSerializerList(ModelSerializer):
             'is_favorited',
             'is_in_shopping_cart',
             'name',
-            # 'image',
+            'image',
             'text',
             'cooking_time',
         )
@@ -175,50 +188,53 @@ class RecipeSerializerList(ModelSerializer):
 class FavoritRecipeSerializer(ModelSerializer):
     id = serializers.IntegerField(required=False,)
     name = serializers.CharField(required=False)
-    # # image
+    image = Base64ImageField(
+        required=False, allow_null=True
+    )
     cooking_time = serializers.IntegerField(required=False)
     class Meta:
         model = Recipe
         fields = (
             'id',
             'name',
-            # # 'image',
+            'image',
             'cooking_time',
         )
         read_only_fields = (
             'id',
             'name',
-            # 'image',
+            'image',
             'cooking_time',
         )
  
     def create(self, validated_data):
-        author = validated_data.pop('author')
-        recipe_id =  validated_data.pop('id')
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        user = validated_data.pop('user')
+        recipe =  validated_data.pop('recipe')
         Favorites.objects.create(
                 recipe=recipe,
-                user=author)
+                user=user)
         return recipe
 
 
 class CartsRecipeSerializer(ModelSerializer):
     id = serializers.IntegerField(required=False)
     name = serializers.CharField(required=False)
-    # # image
+    image = Base64ImageField(
+        required=False, allow_null=True
+    )
     cooking_time = serializers.IntegerField(required=False)
     class Meta:
         model = Recipe
         fields = (
             'id',
             'name',
-            # # 'image',
+            'image',
             'cooking_time',
         )
         read_only_fields = (
             'id',
             'name',
-            # 'image',
+            'image',
             'cooking_time',
         )
 

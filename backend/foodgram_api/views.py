@@ -45,8 +45,7 @@ class UserViewSet(DjoserUserViewSet):
         elif self.action == 'set_password':
             return UserSetPasswordSerializer
         return UserSerializer
-    
-    
+
     @action(
         detail=False,
         permission_classes=(IsAuthenticated,))
@@ -105,8 +104,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     
     def get_serializer_class(self):
         if self.action == 'create' or 'update':
-            if self.basename == 'favorite':
-                return FavoritRecipeSerializer
             return RecipeSerializer
         return RecipeSerializerList
     
@@ -129,14 +126,45 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return response
 
 
-
-class ShoppingCartViewSet(viewsets.ModelViewSet):
+class FavoritViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с моделью Comments."""
-    serializer_class = CartsRecipeSerializer
-    permission_classes = (IsAuthenticated,)
-
-    http_method_names = ('post', 'delete', 'get')
+    serializer_class = FavoritRecipeSerializer
+    # permission_classes = (IsAuthenticated,)
+    
+    def get_queryset(self):
+        recipe_id = self.kwargs.get('recipe_id')
+        new_queryset = Favorites.objects.select_related('recipe', 'user').filter(recipe=recipe_id)
+        return new_queryset
     
     def perform_create(self, serializer):
         recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))
         serializer.save(user=self.request.user, recipe=recipe)
+    
+    @action(methods=('delete',), detail=True)
+    def delete(self, request, *args, **kwargs):
+        recipe_id = self.kwargs.get('recipe_id')
+        instance = Favorites.objects.select_related('recipe', 'user').filter(recipe=recipe_id)
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ShoppingCartViewSet(viewsets.ModelViewSet):
+    """Вьюсет для работы с моделью Comments."""
+    serializer_class = CartsRecipeSerializer
+    # permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        recipe_id = self.kwargs.get('recipe_id')
+        new_queryset = Carts.objects.select_related('recipe', 'user').filter(recipe=recipe_id)
+        return new_queryset
+    
+    def perform_create(self, serializer):
+        recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))
+        serializer.save(user=self.request.user, recipe=recipe)
+    
+    @action(methods=('delete',), detail=True)
+    def delete(self, request, *args, **kwargs):
+        recipe_id = self.kwargs.get('recipe_id')
+        instance = Carts.objects.select_related('recipe', 'user').filter(recipe=recipe_id)
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)

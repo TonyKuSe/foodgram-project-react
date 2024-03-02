@@ -56,31 +56,45 @@ TEMPLATES = [
     },
 ]
 
+# # DATABASES = {
+# #     'default': {
+# #         # Меняем настройку Django: теперь для работы будет использоваться
+# #         # бэкенд postgresql
+# #         'ENGINE': 'django.db.backends.postgresql',
+# #         'NAME': os.getenv('POSTGRES_DB', 'django'),
+# #         'USER': os.getenv('POSTGRES_USER', 'django'),
+# #         'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+# #         'HOST': os.getenv('DB_HOST', ''),
+# #         'PORT': os.getenv('DB_PORT', 5432)
+# #     }
+# # }
+
+
 # DATABASES = {
-#     'default': {
-#         # Меняем настройку Django: теперь для работы будет использоваться
-#         # бэкенд postgresql
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('POSTGRES_DB', 'django'),
-#         'USER': os.getenv('POSTGRES_USER', 'django'),
-#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-#         'HOST': os.getenv('DB_HOST', ''),
-#         'PORT': os.getenv('DB_PORT', 5432)
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         # "NAME": os.getenv("DB_NAME", default="postgres"),
+#         'NAME': 'test_database',
+#         'USER': 'postgres',
+#         # "USER": os.getenv("POSTGRES_USER", default="postgres"),
+#         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="postgres"),
+#         "HOST": os.getenv("DB_HOST", default=''),
+#         "PORT": os.getenv("DB_PORT", default=5432),
 #     }
 # }
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        # "NAME": os.getenv("DB_NAME", default="postgres"),
-        'NAME': 'test_database',
-        'USER': 'postgres',
-        # "USER": os.getenv("POSTGRES_USER", default="postgres"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="postgres"),
-        "HOST": os.getenv("DB_HOST", default=''),
-        "PORT": os.getenv("DB_PORT", default=5432),
+    'default': {
+        # Меняем настройку Django: теперь для работы будет использоваться
+        # бэкенд postgresql
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'test_database'),
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default="postgres"),
+        'HOST': os.getenv('DB_HOST', ''),
+        'PORT': os.getenv('DB_PORT', 5432)
     }
 }
-
 AUTH_USER_MODEL = "users.FoodUser"
 
 # AUTH_PASSWORD_VALIDATORS = [
@@ -131,18 +145,19 @@ DJOSER = {
         "resipe": ("foodgram_api.permissions.IsAuthenticated,",),
         "recipe_list": ("foodgram_api.permissions.AuthorStaffOrReadOnly",),
         "user": ("foodgram_api.permissions.OwnerUserOrReadOnly",),
-        'user_list': ("foodgram_api.permissions.OwnerUserOrReadOnly",),
+        'user_list': ("foodgram_api.permissions.AllowAny",),
         'subscribe': ("foodgram_api.permissions.OwnerUserOrReadOnly",),
         'shopping_cart': ("foodgram_api.permissions.IsAuthenticated,",)
     },
-    # "SERIALIZERS": {
-    #     'user': 'users.serializers.UserSerializer',
-    #     'current_user': 'users.serializers.UserMeSerializer',
-    #     'user_create': 'users.serializers.UserSerializer',
-    #     'set_password': 'users.serializers.UserSetPasswordSerializer',
-    #     'password_reset': 'users.serializers.UserSetPasswordSerializer',
-    #     'subscriptions': 'users.serializers.UserSerializer',
-    # },
+    
+#     # "SERIALIZERS": {
+#     #     'user': 'users.serializers.UserSerializer',
+#     #     'current_user': 'users.serializers.UserMeSerializer',
+#     #     'user_create': 'users.serializers.UserSerializer',
+#     #     'set_password': 'users.serializers.UserSetPasswordSerializer',
+#     #     'password_reset': 'users.serializers.UserSetPasswordSerializer',
+#     #     'subscriptions': 'users.serializers.UserSerializer',
+#     # },
 }
 
 

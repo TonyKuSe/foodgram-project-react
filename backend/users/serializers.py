@@ -94,12 +94,15 @@ class UserSerializer(ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
         read_only_fields = ('is_subscribed', 'count')
 
-    def get_is_subscribed(self, obj: User):
-        
-        user = self.context.get('request').user
-        if user.is_anonymous or (user == obj):
-            return False
-        return user.publisher.filter(author=obj).exists()
+    def get_is_subscribed(self, obj):
+
+        # user = self.context.get('request').user
+        # if user.is_anonymous == True:
+        #     return False
+        # elif user == obj:
+        #     return False
+        # return user.publisher.filter(author=obj).exists()
+        return False
 
     def create(self, validated_data: dict) -> User:
         """Создаёт нового пользователя с запрошенными полями."""
