@@ -1,8 +1,8 @@
-from http import HTTPMethod
-from datetime import datetime
+# from http import HTTPMethod
+# from datetime import datetime
 from django.http import HttpResponse
-from django.shortcuts import render
-from django.core.mail import send_mail
+# from django.shortcuts import render
+# from django.core.mail import send_mail
 from django.db.models.aggregates import Count, Sum
 
 from django.contrib.auth import get_user_model
@@ -13,8 +13,8 @@ from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import decorators, response, status, viewsets, filters, views, mixins, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.routers import APIRootView
-from reviews.enums import Tuples, UrlQueries
+# from rest_framework.routers import APIRootView
+# from reviews.enums import Tuples, UrlQueries
 from reviews.models import Carts, Favorites, Ingredient, Recipe, Tag, RecipeIngredient
 from users.models import Subscriptions
 from django.shortcuts import get_object_or_404
@@ -24,8 +24,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .paginators import PageLimitPagination
 from .permissions import (AdminOrReadOnly, AuthorStaffOrReadOnly,
                           FoodDjangoModelPermissions, FoodIsAuthenticated,
-                          AllowAnyMe, OwnerUserOrReadOnly, IsAuthenticated)
-from users.serializers import (UserSubscribeSerializer,
+                          AllowAnyMe, OwnerUserOrReadOnly, IsAuthenticated, IsAuthenticatedOrReadOnly)
+from users.serializers import (UserSubscribeSerializer, UserMeSerializer,
                                UserSerializer, UserRetrieveSerializer, UserSetPasswordSerializer, FollowSerializer)
 from .serializers import (IngredientSerializer, RecipeSerializer, RecipeSerializerList, FavoritRecipeSerializer,
                           CartsRecipeSerializer, TagSerializer)
@@ -38,6 +38,11 @@ class UserViewSet(DjoserUserViewSet):
     pagination_class = PageLimitPagination
     permission_classes = ()
     filter_backends = (filters.SearchFilter,)
+    
+    def get_object(self):
+        id = self.kwargs.get('id')
+        obj = get_object_or_404(User, id=id)
+        return obj
     
     def get_serializer_class(self):
         if self.action == 'retrieve' and self.request.data is not None:
@@ -88,6 +93,7 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (AdminOrReadOnly,)
+    pagination_class = None
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -95,12 +101,13 @@ class IngredientViewSet(viewsets.ModelViewSet):
 
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    # permission_classes = (AdminOrReadOnly,)
+    permission_classes = (AdminOrReadOnly,)
+    pagination_class = None
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (AuthorStaffOrReadOnly,)
     
     def get_serializer_class(self):
         if self.action == 'create' or 'update':
@@ -113,23 +120,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(methods=("get",), detail=False)
     def download_shopping_cart(self, request: WSGIRequest) -> Response:
         """Загружает файл со списком покупок"""
-        user = self.request.user
-        recipe_list = Carts.objects.all().filter(user=user).values('recipe_id')
-        shopping_list = []
-        for recipe_id in recipe_list:
-            shopping_list.append(RecipeIngredient.objects.all().filter(
-                recipe__id=recipe_id['recipe_id']).values(
-                    'ingredient__name', 'ingredient__measurement_unit').annotate(Sum('amount')))
+        text_final = list()
+        for recipe_id in Carts.objects.all().filter(user=self.request.user).values('recipe'): 
+            for text in RecipeIngredient.objects.all().filter(
+                recipe__id=recipe_id['recipe']).values(
+                    'ingredient__name', 'ingredient__measurement_unit').annotate(Sum('amount')):
+                text_f = (f'{text.setdefault("ingredient__name",["default"])} {text.setdefault("ingredient__measurement_unit",["default"])} - {text.setdefault("amount__sum",["default"])} ')
+                text_final.append(text_f)
         response = HttpResponse(
-            shopping_list, content_type="text.txt; charset=utf-8"
+            text_final, content_type="text.txt; charset=utf-8"
         )
         return response
 
 
 class FavoritViewSet(viewsets.ModelViewSet):
-    """Вьюсет для работы с моделью Comments."""
+    """Вьюсет для работы с моделью ."""
     serializer_class = FavoritRecipeSerializer
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (AuthorStaffOrReadOnly,)
     
     def get_queryset(self):
         recipe_id = self.kwargs.get('recipe_id')
@@ -141,7 +148,7 @@ class FavoritViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user, recipe=recipe)
     
     @action(methods=('delete',), detail=True)
-    def delete(self, request, *args, **kwargs):
+    def delete(self):
         recipe_id = self.kwargs.get('recipe_id')
         instance = Favorites.objects.select_related('recipe', 'user').filter(recipe=recipe_id)
         self.perform_destroy(instance)
@@ -149,9 +156,9 @@ class FavoritViewSet(viewsets.ModelViewSet):
 
 
 class ShoppingCartViewSet(viewsets.ModelViewSet):
-    """Вьюсет для работы с моделью Comments."""
+    """Вьюсет для работы с моделью ."""
     serializer_class = CartsRecipeSerializer
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (AuthorStaffOrReadOnly,)
 
     def get_queryset(self):
         recipe_id = self.kwargs.get('recipe_id')

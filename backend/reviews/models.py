@@ -54,18 +54,15 @@ class Recipe(models.Model):
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
         default=Limits.DEF_NUM,
-
     )
 
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         ordering = ('-pub_date',)
-        
-
+    
     def __str__(self) -> str:
         return f'{self.name}. Автор: {self.author}'
-
 
 
 class Ingredient(models.Model):
@@ -89,6 +86,9 @@ class Ingredient(models.Model):
     def __str__(self) -> str:
         return f"{self.name} {self.measurement_unit}"
 
+
+    def __str__(self) -> str:
+        return f"{self.name}"
 
 
 class RecipeIngredient(models.Model):
@@ -148,7 +148,7 @@ class Tag(models.Model):
         ordering = ('name',)
 
     def __str__(self) -> str:
-        return {self.name}
+        return f'{self.name} (цвет: {self.color})'
 
 
 class Favorites(models.Model):

@@ -1,12 +1,10 @@
-# Файл docker-compose.yml
-
-# Версия docker-compose
 version: '3.3'
 
 volumes:
   pg_data:
-  # Новый volume — для статических файлов
   static:
+  media:
+  static_frontend:
 
 services:
   db:
@@ -14,22 +12,32 @@ services:
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
+
   backend:
-    build: ./backend/
+    image: toniku/food_backend
     env_file: .env
-    # Тут подключаем volume к backend
     volumes:
-      - static:/backend_static
+      - static:/static/
+      - media:/media/
+    depends_on:
+      - db
+
   frontend:
+    image: toniku/food_frontend
     env_file: .env
-    build: ./frontend/
-    command: cp -r /app/build/. /frontend_static/
     volumes:
-      - static:/frontend_static
+      - ./frontend/:/app/result_build/
+
   nginx:
-    build: ./nginx/
-    # А тут подключаем volume со статикой к gateway
+    image: toniku/food_nginx
     volumes:
-      - static:/staticfiles/
+      - static:/etc/nginx/html/static/
+      - ./frontend/build:/usr/share/nginx/html/
+      - media:/etc/nginx/html/media/
+      - ./docs/:/usr/share/nginx/html/api/docs/
+      - static_frontend:/static_frontend/
     ports:
       - 8000:80 
+    depends_on:
+      - backend
+      - frontend

@@ -4,16 +4,16 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.db import models
-from django.db.transaction import atomic
+# from django.db.transaction import atomic
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework import serializers
 import base64
 
 from django.core.files.base import ContentFile
 from reviews.models import Ingredient, Recipe, Tag, RecipeIngredient, Favorites, Carts
-from users.models import Subscriptions, FoodUser
-from rest_framework.validators import UniqueTogetherValidator
-from rest_framework.decorators import api_view
+# from users.models import Subscriptions, FoodUser
+# from rest_framework.validators import UniqueTogetherValidator
+# from rest_framework.decorators import api_view
 from users.serializers import UserSerializer
 
 
@@ -38,7 +38,7 @@ class ShortRecipeSerializer(ModelSerializer):
 
 class TagSerializer(ModelSerializer):
     """Сериализатор для вывода тэгов."""
-
+    
     class Meta:
         model = Tag
         fields = ('id', 'name', 'color', 'slug')
@@ -136,11 +136,22 @@ class RecipeSerializer(ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop('ingredients')
-        # for ingredient in ingredients:
-        #     id = ingredient['id']
-        # validated_data.update['ingredients'] = 0
-        return super().update(instance, validated_data)
+        ingredients_data = validated_data.pop('ingredients')
+        for ingredient in ingredients_data:
+            current_ingredient = get_object_or_404(Ingredient,id=ingredient['id'])
+            RecipeIngredient.objects.create(
+                recipe_id=instance.id,
+                ingredient_id=current_ingredient.id,
+                amount=ingredient['amount'])
+       # instance.ingredients.set(ingredients_data)
+        tags_data = self.initial_data.pop('tags')
+        instance.tags.set(tags_data)
+        instance.name = validated_data.get('name', instance.name)
+        instance.image = validated_data.get('image', instance.image)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get('cooking_time ', instance.cooking_time)
+        instance.save()
+        return instance
 
 
 class RecipeSerializerList(ModelSerializer):

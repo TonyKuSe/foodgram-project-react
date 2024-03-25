@@ -1,18 +1,18 @@
 from collections import OrderedDict
 
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+# from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
-from django.db import models
-from django.db.transaction import atomic
+# from django.db import models
+# from django.db.transaction import atomic
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework import serializers
 
-from reviews.models import Ingredient, Recipe, Tag
+# from reviews.models import Ingredient, Recipe, Tag
 from users.models import Subscriptions, FoodUser
 # from reviews.validators import ingredients_validator, tags_exist_validator
 from rest_framework.validators import UniqueTogetherValidator
-from rest_framework.decorators import api_view
+# from rest_framework.decorators import api_view
 from djoser.serializers import SetPasswordSerializer
 
 
@@ -20,11 +20,13 @@ User = get_user_model()
 
 class UserSetPasswordSerializer(SetPasswordSerializer):
     
-
+    new_password = serializers.CharField()
+    current_password =  serializers.CharField()
     class Meta:
         model = User
         fields = ( 
-           'id',
+           'new_password',
+           'current_password'
         )
 
 class UserRetrieveSerializer(ModelSerializer):
@@ -49,35 +51,33 @@ class UserRetrieveSerializer(ModelSerializer):
 
 
     def get_email(self, obj):
-        x = get_object_or_404(User, id=self.context['request'].data['id'])
-        return x.email
+        return obj.email
 
     def get_username(self, obj):
-        x = get_object_or_404(User, id=self.context['request'].data['id'])
-        return x.username
+        return obj.username
 
     def get_first_name(self, obj):
-        x = get_object_or_404(User, id=self.context['request'].data['id'])
-        return x.first_name
+        return obj.first_name
 
     def get_last_name(self, obj):
-        x = get_object_or_404(User, id=self.context['request'].data['id'])
-        return x.last_name
+        return obj.last_name
 
     def get_id(self, obj):
-        x = get_object_or_404(User, id=self.context['request'].data['id'])
-        return x.id
+        return obj.id
     
-    def get_is_subscribed(self, obj: User):
+    def get_is_subscribed(self, obj):
+        user = self.context.get('request').user
+        if user.is_anonymous or (user == obj):
+            return False
+        return user.publisher.filter(author=obj).exists()
 
-        user = self.context.get('request').user.id
-        # if user.is_anonymous or (user == obj):
-        #     return False
-        # x = user.publisher.filter(author=obj).exists()
-        return user
-
-class UserSerializer(ModelSerializer):
+class UserMeSerializer(ModelSerializer):
     
+    email = serializers.SerializerMethodField()
+    id = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
+    first_name = serializers.SerializerMethodField()
+    last_name = serializers.SerializerMethodField()
     is_subscribed = SerializerMethodField()
 
     class Meta:
@@ -89,20 +89,46 @@ class UserSerializer(ModelSerializer):
             'first_name',
             'last_name',
             'is_subscribed',
+        )
+
+    def get_email(self, validated_data):
+        x = self.context['request'].data
+        user = self.context['request'].user
+        return obj.email
+
+    def get_username(self, obj):
+        return obj.username
+
+    def get_first_name(self, obj):
+        return obj.first_name
+
+    def get_last_name(self, obj):
+        return obj.last_name
+
+    def get_id(self, obj):
+        return obj.id
+    
+    def get_is_subscribed(self, obj):
+        user = self.context.get('request').user
+        if user.is_anonymous or (user == obj):
+            return False
+        return user.publisher.filter(author=obj).exists()
+
+class UserSerializer(ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
             'password',
         )
         extra_kwargs = {'password': {'write_only': True}}
-        read_only_fields = ('is_subscribed', 'count')
+        read_only_fields = ('id',)
 
-    def get_is_subscribed(self, obj):
-
-        # user = self.context.get('request').user
-        # if user.is_anonymous == True:
-        #     return False
-        # elif user == obj:
-        #     return False
-        # return user.publisher.filter(author=obj).exists()
-        return False
 
     def create(self, validated_data: dict) -> User:
         """Создаёт нового пользователя с запрошенными полями."""

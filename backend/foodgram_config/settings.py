@@ -7,11 +7,21 @@ DATE_TIME_FORMAT = "%d/%m/%Y %H:%M"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-cg6*%6d51ef8f#4!r3*$vmxm4)abgjw8mo!4y-q*uq1!4$-89$'
+# SECRET_KEY = 'django-insecure-cg6*%6d51ef8f#4!r3*$vmxm4)abgjw8mo!4y-q*uq1!4$-89$'
+SECRET_KEY = 'd5071bea3ec8160a9bf6a50f7a46f72834f83c0e'
 
 DEBUG = True
-ALLOWED_HOSTS = []
-# ALLOWED_HOSTS = ['198.211.99.20', 'localhost', '127.0.0.1', 'backend']
+# DEBUG = False
+
+# ALLOWED_HOSTS = ['51.250.25.35', 'food-contact.online']
+ALLOWED_HOSTS = ['localhost']
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://51.250.25.35",
+    "https://food-contact.online",
+    "http://localhost:8080",
+    "http://127.0.0.1:8000"
+]
 
 ROOT_URLCONF = "foodgram_config.urls"
 
@@ -25,19 +35,21 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework',
     'djoser',
+    'corsheaders',
     'foodgram_api.apps.FoodgramApiConfig',
     'users.apps.UsersConfig',
     'reviews.apps.ReviewsConfig'
 ]
 
 MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 TEMPLATES = [
@@ -56,32 +68,6 @@ TEMPLATES = [
     },
 ]
 
-# # DATABASES = {
-# #     'default': {
-# #         # Меняем настройку Django: теперь для работы будет использоваться
-# #         # бэкенд postgresql
-# #         'ENGINE': 'django.db.backends.postgresql',
-# #         'NAME': os.getenv('POSTGRES_DB', 'django'),
-# #         'USER': os.getenv('POSTGRES_USER', 'django'),
-# #         'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-# #         'HOST': os.getenv('DB_HOST', ''),
-# #         'PORT': os.getenv('DB_PORT', 5432)
-# #     }
-# # }
-
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         # "NAME": os.getenv("DB_NAME", default="postgres"),
-#         'NAME': 'test_database',
-#         'USER': 'postgres',
-#         # "USER": os.getenv("POSTGRES_USER", default="postgres"),
-#         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="postgres"),
-#         "HOST": os.getenv("DB_HOST", default=''),
-#         "PORT": os.getenv("DB_PORT", default=5432),
-#     }
-# }
 
 DATABASES = {
     'default': {
@@ -97,13 +83,6 @@ DATABASES = {
 }
 AUTH_USER_MODEL = "users.FoodUser"
 
-# AUTH_PASSWORD_VALIDATORS = [
-
-#     {
-#         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-#     },
-
-# ]
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -143,23 +122,13 @@ DJOSER = {
     "HIDE_USERS": False,
     "PERMISSIONS": {
         "resipe": ("foodgram_api.permissions.IsAuthenticated,",),
-        "recipe_list": ("foodgram_api.permissions.AuthorStaffOrReadOnly",),
+        "recipe_list": ("foodgram_api.permissions.AllowAny",),
         "user": ("foodgram_api.permissions.OwnerUserOrReadOnly",),
         'user_list': ("foodgram_api.permissions.AllowAny",),
         'subscribe': ("foodgram_api.permissions.OwnerUserOrReadOnly",),
         'shopping_cart': ("foodgram_api.permissions.IsAuthenticated,",)
     },
-    
-#     # "SERIALIZERS": {
-#     #     'user': 'users.serializers.UserSerializer',
-#     #     'current_user': 'users.serializers.UserMeSerializer',
-#     #     'user_create': 'users.serializers.UserSerializer',
-#     #     'set_password': 'users.serializers.UserSetPasswordSerializer',
-#     #     'password_reset': 'users.serializers.UserSetPasswordSerializer',
-#     #     'subscriptions': 'users.serializers.UserSerializer',
-#     # },
 }
-
 
 LANGUAGE_CODE = "ru"
 TIME_ZONE = "UTC"
@@ -173,8 +142,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / MEDIA_URL
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = BASE_DIR / 'static'
-STATIC_ROOT = BASE_DIR / 'collected_static'
+#STATIC_ROOT = BASE_DIR / 'static'
+# STATIC_ROOT = BASE_DIR / 'staticfiles' 'collected_static'
+STATIC_ROOT = BASE_DIR / 'static'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

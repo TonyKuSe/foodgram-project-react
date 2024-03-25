@@ -25,36 +25,16 @@ class FoodUser(AbstractUser):
         max_length=Limits.MAX_LEN_USERNAME.value,
         unique=True,
         help_text=texts.USER_HELP_USERNAME,
-        # validators=(
-        #     validators.MinLenValidator(
-        #         field='username',
-        #     ),
-        #     validators.OneOfTwoValidator(field='username'),
-        # ),
     )
     first_name = models.CharField(
         verbose_name='Имя',
         max_length=Limits.MAX_LEN_FIRST_NAME.value,
         help_text=texts.USER_HELP_F_NAME,
-        # validators=(
-        #     validators.OneOfTwoValidator(
-        #         first_regex='[^а-яёА-ЯЁ -]+',
-        #         second_regex='[^a-zA-Z -]+',
-        #         field='Имя',
-        #     ),
-        # ),
     )
     last_name = models.CharField(
         verbose_name='Фамилия',
         max_length=Limits.MAX_LEN_LAST_NAME.value,
         help_text=texts.USER_HELP_L_NAME,
-        # validators=(
-        #     validators.OneOfTwoValidator(
-        #         first_regex='[^а-яёА-ЯЁ -]+',
-        #         second_regex='[^a-zA-Z -]+',
-        #         field='Фамилия',
-        #     ),
-        # ),
     )
     password = models.CharField(
         verbose_name=_('Пароль'),
