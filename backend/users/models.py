@@ -56,9 +56,10 @@ class FoodUser(AbstractUser):
                 name='User',
             ),
         )
-        
+
     def __str__(self) -> str:
-        return '%d: %s' % (self.email, self.username)
+        return f'{self.email}, {self.username}'
+    # return '%d: %s' % (self.email, self.username)
 
 
 class Subscriptions(models.Model):
@@ -69,14 +70,12 @@ class Subscriptions(models.Model):
         related_name='follower',
         on_delete=models.CASCADE,
     )
-
     author = models.ForeignKey(
         'FoodUser',
         verbose_name='Автор рецепта',
         related_name='publisher',
         on_delete=models.CASCADE,
     )
-
     date_added = models.DateTimeField(
         verbose_name='Дата создания подписки',
         auto_now_add=True,
@@ -98,5 +97,4 @@ class Subscriptions(models.Model):
         )
 
     def __str__(self) -> str:
-        return f'{self.user.username} подписан {self.author.username}'
-        
+        return f'{self.user.id} подписан {self.author.id}'

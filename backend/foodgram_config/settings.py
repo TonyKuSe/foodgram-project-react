@@ -11,10 +11,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'd5071bea3ec8160a9bf6a50f7a46f72834f83c0e'
 
 DEBUG = True
-# DEBUG = False
+#DEBUG = False
 
 # ALLOWED_HOSTS = ['51.250.25.35', 'food-contact.online']
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
     "https://51.250.25.35",
@@ -68,7 +68,6 @@ TEMPLATES = [
     },
 ]
 
-
 DATABASES = {
     'default': {
         # Меняем настройку Django: теперь для работы будет использоваться
@@ -114,7 +113,7 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2,
+    'PAGE_SIZE': 6,
 }
 
 DJOSER = {
@@ -123,9 +122,10 @@ DJOSER = {
     "PERMISSIONS": {
         "resipe": ("foodgram_api.permissions.IsAuthenticated,",),
         "recipe_list": ("foodgram_api.permissions.AllowAny",),
-        "user": ("foodgram_api.permissions.OwnerUserOrReadOnly",),
+        "user": ("foodgram_api.permissions.IsAuthenticated",),
         'user_list': ("foodgram_api.permissions.AllowAny",),
-        'subscribe': ("foodgram_api.permissions.OwnerUserOrReadOnly",),
+        'subscribe': ("foodgram_api.permissions.IsAuthenticated",),
+        'subscriptions': ("foodgram_api.permissions.IsAuthenticated",),
         'shopping_cart': ("foodgram_api.permissions.IsAuthenticated,",)
     },
 }

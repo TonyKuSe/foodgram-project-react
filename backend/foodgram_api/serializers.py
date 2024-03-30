@@ -29,12 +29,14 @@ class Base64ImageField(serializers.ImageField):
 
         return super().to_internal_value(data)
 
+
 class ShortRecipeSerializer(ModelSerializer):
     """Сериализатор для показа модели Recipe."""
     class Meta:
         model = Recipe
         fields = ("id", "name", "image", "cooking_time")
         read_only_fields = ("__all__",)
+
 
 class TagSerializer(ModelSerializer):
     """Сериализатор для вывода тэгов."""
@@ -50,7 +52,7 @@ class TagSerializer(ModelSerializer):
             data[attr] = value.sttrip(" ").upper()
         return data
 
- 
+
 class IngredientSerializer(ModelSerializer):
 
     class Meta:
@@ -68,7 +70,8 @@ class CreateRecipeIngredientSerializer(ModelSerializer):
         read_only_fields = ('id',)
 
 
-class Hex2NameColor(serializers.Field):
+class FiedIngredientsList(serializers.Field):
+    
     def to_representation(self, value):
         recipe_id = value.core_filters
         ingredient = Ingredient.objects.all().filter(recipe=recipe_id ['recipe__id']).values(
@@ -91,7 +94,7 @@ class RecipeSerializer(ModelSerializer):
     
     author = UserSerializer(many=False, required=False)
     tags = TagSerializer(many=True, read_only=True)
-    ingredients = Hex2NameColor()
+    ingredients = FiedIngredientsList()
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
     image = Base64ImageField(
@@ -117,10 +120,10 @@ class RecipeSerializer(ModelSerializer):
         )
 
     def get_is_favorited(self, recipe):
-        return True
-
-    def get_is_in_shopping_cart(self, recipe):
-        return True
+        return self.context['request'].user.favorites.filter(recipe=recipe).exists() 
+        
+    def get_is_in_shopping_cart(self, recipe):  
+        return Carts.objects.all().filter(user=self.context['request'].user, recipe=recipe).exists()
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
@@ -137,19 +140,19 @@ class RecipeSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         ingredients_data = validated_data.pop('ingredients')
+        x = list
+        RecipeIngredient.objects.all().filter(recipe_id=instance.id).delete()
         for ingredient in ingredients_data:
-            current_ingredient = get_object_or_404(Ingredient,id=ingredient['id'])
             RecipeIngredient.objects.create(
                 recipe_id=instance.id,
-                ingredient_id=current_ingredient.id,
+                ingredient_id=ingredient['id'],
                 amount=ingredient['amount'])
-       # instance.ingredients.set(ingredients_data)
         tags_data = self.initial_data.pop('tags')
         instance.tags.set(tags_data)
         instance.name = validated_data.get('name', instance.name)
         instance.image = validated_data.get('image', instance.image)
         instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get('cooking_time ', instance.cooking_time)
+        instance.cooking_time = validated_data.get('cooking_time', instance.cooking_time)
         instance.save()
         return instance
 
@@ -158,7 +161,7 @@ class RecipeSerializerList(ModelSerializer):
     """Сериализатор для рецептов."""
     author = UserSerializer(many=False)
     tags = TagSerializer(many=True)
-    ingredients = Hex2NameColor()
+    ingredients = FiedIngredientsList()
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
 
