@@ -123,7 +123,7 @@ class RecipeSerializer(ModelSerializer):
         return self.context['request'].user.favorites.filter(recipe=recipe).exists() 
         
     def get_is_in_shopping_cart(self, recipe):  
-        return Carts.objects.all().filter(user=self.context['request'].user, recipe=recipe).exists()
+        return Carts.objects.filter(user=self.context['request'].user, recipe=recipe).exists()
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
@@ -158,7 +158,7 @@ class RecipeSerializer(ModelSerializer):
 
 
 class RecipeSerializerList(ModelSerializer):
-    """Сериализатор для рецептов."""
+    """Сериализатор для выведения всех рецептов."""
     author = UserSerializer(many=False)
     tags = TagSerializer(many=True)
     ingredients = FiedIngredientsList()
