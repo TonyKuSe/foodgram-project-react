@@ -13,7 +13,8 @@ class RecipeIngredientAdmin(admin.StackedInline):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'author', 'name', 'text',
+        'id','name',
+        'author', 'text',
         'cooking_time', 
         # 'get_favorite_count'
         'tags', 'ingredients',
@@ -74,7 +75,7 @@ class FavoritesAdmin(admin.ModelAdmin):
         description='Рецепты')
     def get_recipe(self, obj):
         return [
-            f'{item["name"]} ' for item in obj.recipe.values('name')[:5]]
+            f'{item["name"]} ' for item in obj.recipe.name]
 
     @admin.display(
         description='В избранных')
@@ -91,7 +92,7 @@ class CartAdmin(admin.ModelAdmin):
     @admin.display(description='Рецепты')
     def get_recipe(self, obj):
         return [
-            f'{item["name"]} ' for item in obj.recipe.name[:5]]
+            f'{item["name"]} ' for item in obj.recipe.name]
 
     @admin.display(description='В избранных')
     def get_count(self, obj):
