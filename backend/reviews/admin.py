@@ -16,7 +16,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'id','name',
         'author', 'text',
         'cooking_time', 
-        'get_favorite_count'
+        'favorite_count'
         'tags', 'ingredients',
         'pub_date',)
     search_fields = (
@@ -35,7 +35,7 @@ class RecipeAdmin(admin.ModelAdmin):
         return obj.ingredients.name
 
     @admin.display(description='В избранном')
-    def get_favorite_count(self, kwags):
+    def favorite_count(self, kwags):
         return kwags.favorite_recipe.count()
 
 
@@ -74,8 +74,11 @@ class FavoritesAdmin(admin.ModelAdmin):
     @admin.display(
         description='Рецепты')
     def get_recipe(self, obj):
-        return [
-            f'{item["name"]} ' for item in obj.recipe.name]
+        if isinstance(obj.recipe, list):
+            return [
+                f'{item["name"]} ' for item in obj.recipe if 'name' in item
+                ]
+        return 'Некорректный формат рецепта'
 
     @admin.display(
         description='В избранных')
