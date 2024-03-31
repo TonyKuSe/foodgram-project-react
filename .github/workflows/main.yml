@@ -39,7 +39,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          context: ./backend/
+          context: backend/
           file: ./Dockerfile
           tags: toniku/food_backend:latest
       - name: Push frontend
