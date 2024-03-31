@@ -189,7 +189,7 @@ class FavoritViewSet(viewsets.ModelViewSet):
 
 
 class ShoppingCartViewSet(viewsets.ModelViewSet):
-    """Вьюсет для работы с моделью ."""
+    """Вьюсет для работы с моделью покупки."""
     serializer_class = CartsRecipeSerializer
     permission_classes = (AuthorStaffOrReadOnly,)
 
@@ -205,6 +205,7 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
     @action(methods=('delete',), detail=True)
     def delete(self, request, *args, **kwargs):
         recipe_id = self.kwargs.get('recipe_id')
-        instance = Carts.objects.select_related('recipe', 'user').filter(recipe=recipe_id)
-        self.perform_destroy(instance)
+        Carts.objects.select_related('recipe', 'user').filter(recipe=recipe_id).delete()
+        # instance = Carts.objects.select_related('recipe', 'user').filter(recipe=recipe_id)
+        # self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
