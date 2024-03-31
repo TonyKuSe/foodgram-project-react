@@ -3,51 +3,50 @@ name: cicd_test_deploy
 on: [push]
 
 jobs:
-  tests:
-    name: Pytest
-    runs-on: ubuntu-20.04
-    steps:
-      - name: checkout repo
-        uses: actions/checkout@v4
-      - name: Python setup
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10' 
-      - name: Setup dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    tests:
+        name: Pytest
+        runs-on: ubuntu-20.04
+        steps:
+          - name: checkout repo
+            uses: actions/checkout@v4
+          - name: Python setup
+            uses: actions/setup-python@v5
+            with:
+                python-version: '3.10' 
+          - name: Setup dependencies
+            run: |
+                python -m pip install --upgrade pip
+                pip install -r requirements.txt
 
-  push_to_dockerhub:
-    needs: tests
-    name: Push to dockerhub
-    runs-on: ubuntu-20.04
-    steps:
-      - name: checkout repo
-        uses: actions/checkout@v4
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: toniku/food_backend:latest
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend/
-          push: true
-        #   file: ./Dockerfile
-          tags: toniku/food_backend:latest
-#       - name: Push frontend
-#         uses: docker/build-push-action@v2 
-#         with:
-#             context: frontend/
-#             push: true
-#             tags: foodgram_frontend:latest
+    push_to_dockerhub:
+        needs: tests
+        name: Push to dockerhub
+        runs-on: ubuntu-20.04
+        steps:
+          - name: checkout repo
+            uses: actions/checkout@v4
+          - name: Login to Docker Hub
+            uses: docker/login-action@v3
+            with:
+                username: ${{ secrets.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_PASSWORD }}
+          - name: Docker meta
+            id: meta
+            uses: docker/metadata-action@v5
+            with:
+                images: toniku/food_backend:latest
+          - name: Build and push
+            uses: docker/build-push-action@v5
+            with:
+                context: ./backend/
+                push: true
+                tags: toniku/food_backend:latest
+          - name: Push frontend
+            uses: docker/build-push-action@v2 
+            with:
+                context: frontend/
+                push: true
+                tags: foodgram_frontend:latest
 #   deploy:
 #     name: Deploy
 #     runs-on: ubuntu-20.04
