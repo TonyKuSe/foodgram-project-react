@@ -99,4 +99,4 @@ class CartAdmin(admin.ModelAdmin):
 
     @admin.display(description='В избранных')
     def get_count(self, obj):
-        return obj.recipe.count()
+        return obj.recipe.all().count()
