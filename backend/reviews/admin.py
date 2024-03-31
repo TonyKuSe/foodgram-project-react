@@ -16,7 +16,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'id','name',
         'author', 'text',
         'cooking_time', 
-        # 'get_favorite_count'
+        'get_favorite_count'
         'tags', 'ingredients',
         'pub_date',)
     search_fields = (
@@ -34,9 +34,9 @@ class RecipeAdmin(admin.ModelAdmin):
     def ingredients(self, obj):
         return obj.ingredients.name
 
-    # @admin.display(description='В избранном')
-    # def get_favorite_count(self, obj):
-    #     return obj.favorite_recipe.count()
+    @admin.display(description='В избранном')
+    def get_favorite_count(self, kwags):
+        return kwags.favorite_recipe.count()
 
 
 @admin.register(Tag)
@@ -86,7 +86,7 @@ class FavoritesAdmin(admin.ModelAdmin):
 @admin.register(Carts)
 class CartAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'user', 'get_recipe', 'get_count')
+        'id', 'user', 'get_recipe')
     empty_value_display = EMPTY_MSG
 
     @admin.display(description='Рецепты')
@@ -97,6 +97,3 @@ class CartAdmin(admin.ModelAdmin):
             ]
         return 'Некорректный формат рецепта'
 
-    @admin.display(description='В избранных')
-    def get_count(self, obj):
-        return obj.recipe.all().count()
