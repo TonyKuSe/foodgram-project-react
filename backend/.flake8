@@ -1,0 +1,5 @@
+[flake8]
+exclude =
+    ./reviews/migrations/
+    ./users/migrations/
+    ./foodgram_api/migrations/

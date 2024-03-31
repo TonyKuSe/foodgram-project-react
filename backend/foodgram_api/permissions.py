@@ -29,7 +29,6 @@ class AuthorStaffOrReadOnly(BasePermission):
             request.method in SAFE_METHODS
             or request.user.is_authenticated
             and request.user.is_active
-            and request.user.is_anonymous
             and (request.user == obj.author or request.user.is_staff)
         )
 

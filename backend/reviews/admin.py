@@ -16,7 +16,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'id', 'author', 'name', 'text',
         'cooking_time', 
         # 'get_favorite_count'
-        'get_tags', 'get_ingredients',
+        'tags', 'ingredients',
         'pub_date',)
     search_fields = (
         'name', 'cooking_time',
@@ -26,18 +26,12 @@ class RecipeAdmin(admin.ModelAdmin):
     empty_value_display = EMPTY_MSG
 
     @admin.display(description='Тэги')
-    def get_tags(self, obj):
-        list_ = [_.name for _ in obj.tags.all()]
-        return ', '.join(list_)
+    def tags(self, obj):
+        return obj.tags.all()
 
     @admin.display(description=' Ингредиенты ')
-    def get_ingredients(self, obj):
-        return '\n '.join([
-            f'{item["ingredient__name"]} - {item["amount"]}'
-            f' {item["ingredient__measurement_unit"]}.'
-            for item in obj.ingredients.values(
-                'ingredient__name',
-                'amount', 'ingredient__measurement_unit')])
+    def ingredients(self, obj):
+        return obj.ingredients.name
 
     # @admin.display(description='В избранном')
     # def get_favorite_count(self, obj):
@@ -80,7 +74,7 @@ class FavoritesAdmin(admin.ModelAdmin):
         description='Рецепты')
     def get_recipe(self, obj):
         return [
-            f'{item["name"]} ' for item in obj.recipe.name[:5]]
+            f'{item["name"]} ' for item in obj.recipe.values('name')[:5]]
 
     @admin.display(
         description='В избранных')
