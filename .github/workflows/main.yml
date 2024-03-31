@@ -38,10 +38,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          push: true
           context: ./backend/
-          file: ./Dockerfile
-          tags: food_backend:latest
+          push: true
+        #   file: ./Dockerfile
+          tags: toniku/food_backend:latest
 #       - name: Push frontend
 #         uses: docker/build-push-action@v2 
 #         with:
