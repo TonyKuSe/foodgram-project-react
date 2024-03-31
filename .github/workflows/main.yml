@@ -46,7 +46,7 @@ jobs:
             with:
                 context: frontend/
                 push: true
-                tags: foodgram_frontend:latest
+                tags: toniku/foodgram_frontend:latest
 #   deploy:
 #     name: Deploy
 #     runs-on: ubuntu-20.04
