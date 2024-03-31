@@ -47,20 +47,39 @@ jobs:
                 context: frontend/
                 push: true
                 tags: toniku/foodgram_frontend:latest
-#   deploy:
-#     name: Deploy
-#     runs-on: ubuntu-20.04
-#     needs: push_to_dockerhub
-#     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
-#     steps:
-#       - name: Execite ssh commands
-#         uses: appleboy/ssh-action@v1.0.3
-#         with:
-#           host: ${{ secrets.SSH_HOST }}
-#           username: ${{ secrets.SSH_USERNAME }}
-#           key: ${{ secrets.SSH_KEY }}
-#           script: |
-#             sudo docker compose stop
-#             sudo docker compose rm web
-#             sudo docker pull milssky/cicd_test:latest
-#             sudo docker compose up -d
+    deploy:
+        name: Deploy
+        runs-on: ubuntu-20.04
+        needs: push_to_dockerhub
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v3
+            - name: Copy docker-compose.yml via ssh
+              uses: appleboy/scp-action@master
+              with:
+                host: ${{ secrets.HOST }}
+                username: ${{ secrets.USER }}
+                key: ${{ secrets.SSH_KEY }}
+                passphrase: ${{ secrets.SSH_PASSPHRASE }}
+                source: "docker-compose.yml"
+                target: "food"
+            - name: Executing remote ssh commands to deploy
+              uses: appleboy/ssh-action@master
+              with:
+                host: ${{ secrets.HOST }}
+                username: ${{ secrets.USER }}
+                key: ${{ secrets.SSH_KEY }}
+                passphrase: ${{ secrets.SSH_PASSPHRASE }}
+                script: |
+                  cd food
+                  # Выполняет pull образов с Docker Hub
+                  sudo docker compose -f docker-compose.yml pull
+                  # Перезапускает все контейнеры в Docker Compose
+                  sudo docker compose -f docker-compose.yml down
+                  sudo docker compose -f docker-compose.yml up -d
+                  # Выполняет миграции и сбор статики
+                  sudo docker compose -f docker-compose.yml exec backend python manage.py migrate
+                  sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic
+                  sudo docker compose -f docker-compose.yml exec backend cp -r /app/static/. /static/
+          
