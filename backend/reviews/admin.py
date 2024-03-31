@@ -91,8 +91,11 @@ class CartAdmin(admin.ModelAdmin):
 
     @admin.display(description='Рецепты')
     def get_recipe(self, obj):
-        return [
-            f'{item["name"]} ' for item in obj.recipe.name]
+        if isinstance(obj.recipe, list):
+            return [
+                f'{item["name"]} ' for item in obj.recipe if 'name' in item
+            ]
+        return 'Некорректный формат рецепта'
 
     @admin.display(description='В избранных')
     def get_count(self, obj):
