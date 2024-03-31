@@ -34,20 +34,20 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: milssky/cicd_test:latest
+          images: toniku/food_backend:latest
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           push: true
           context: backend/
           file: Dockerfile
-          tags: toniku/food_backend:latest
+          tags: food_backend:latest
       - name: Push frontend
         uses: docker/build-push-action@v2 
         with:
             context: frontend/
             push: true
-            tags: toniku/foodgram_frontend:latest
+            tags: foodgram_frontend:latest
   deploy:
     name: Deploy
     runs-on: ubuntu-20.04
