@@ -70,8 +70,6 @@ TEMPLATES = [
 
 DATABASES = {
     'default': {
-        # Меняем настройку Django: теперь для работы будет использоваться
-        # бэкенд postgresql
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('POSTGRES_DB', 'test_database'),
         'USER': os.getenv('POSTGRES_USER', 'postgres'),
@@ -104,7 +102,6 @@ REST_FRAMEWORK = {
     ],
     
     'DEFAULT_PERMISSION_CLASSES': [
-        # "rest_framework.permissions.IsAuthenticatedOrReadOnly",
         'rest_framework.permissions.IsAuthenticated',
     ],
 
@@ -120,9 +117,9 @@ DJOSER = {
     "LOGIN_FIELD": "email",
     "HIDE_USERS": False,
     "PERMISSIONS": {
-        "resipe": ("foodgram_api.permissions.IsAuthenticated,",),
-        "recipe_list": ("foodgram_api.permissions.AllowAny",),
-        "user": ("foodgram_api.permissions.IsAuthenticated",),
+        'resipe': ("foodgram_api.permissions.IsAuthenticated,",),
+        'recipe_list': ("foodgram_api.permissions.AllowAny",),
+        'user': ("foodgram_api.permissions.IsAuthenticated",),
         'user_list': ("foodgram_api.permissions.AllowAny",),
         'subscribe': ("foodgram_api.permissions.IsAuthenticated",),
         'subscriptions': ("foodgram_api.permissions.IsAuthenticated",),

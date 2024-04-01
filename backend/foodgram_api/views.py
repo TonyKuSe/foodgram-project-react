@@ -136,7 +136,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (AuthorStaffOrReadOnly,)
-    
+    permission_classes = (AllowAny,)
     def get_serializer_class(self):
         if self.action == 'create' or 'update':
             return RecipeSerializer
@@ -205,7 +205,6 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
     @action(methods=('delete',), detail=True)
     def delete(self, request, *args, **kwargs):
         recipe_id = self.kwargs.get('recipe_id')
-        # Carts.objects.select_related('recipe', 'user').filter(recipe=recipe_id).delete()
         instance = Carts.objects.select_related('recipe', 'user').filter(recipe=recipe_id)
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
