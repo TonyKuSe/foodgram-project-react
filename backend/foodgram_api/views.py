@@ -135,8 +135,8 @@ class IngredientViewSet(viewsets.ModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    # permission_classes = (AuthorStaffOrReadOnly,)
-    permission_classes = (AllowAny,)
+    permission_classes = (AuthorStaffOrReadOnly,)
+    # permission_classes = (AllowAny,)
     def get_serializer_class(self):
         if self.action == 'create' or 'update':
             return RecipeSerializer

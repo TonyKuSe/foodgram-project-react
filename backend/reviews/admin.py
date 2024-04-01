@@ -18,7 +18,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'id','name',
         'author', 'text',
         'cooking_time', 
-        # 'favorite_count'
+        'favorite_count',
         'tags', 'ingredients',
         'pub_date',)
     search_fields = (
@@ -37,8 +37,8 @@ class RecipeAdmin(admin.ModelAdmin):
         return obj.ingredients.name
 
     @admin.display(description='В избранном')
-    def favorite_count(self, kwags):
-        return kwags.favorite_recipe.count()
+    def favorite_count(self, obj):
+        return obj.favorite_recipe.count()
 
 
 @admin.register(Tag)
