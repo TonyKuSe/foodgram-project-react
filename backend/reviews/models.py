@@ -1,11 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.functions import Length
-from PIL import Image
 
 
-from .enums import Limits, Tuples
+from .enums import Limits
 
 
 models.CharField.register_lookup(Length)
@@ -60,7 +58,7 @@ class Recipe(models.Model):
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         ordering = ('-pub_date',)
-    
+
     def __str__(self) -> str:
         return f'{self.name}. Автор: {self.author}'
 
@@ -81,19 +79,16 @@ class Ingredient(models.Model):
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Ингридиенты'
         # ordering = ('name',)
-        
 
     def __str__(self) -> str:
         return f"{self.name} {self.measurement_unit}"
 
 
-    # def __str__(self) -> str:
-    #     return f"{self.name}"
-
-
 class RecipeIngredient(models.Model):
-    """Количество ингридиентов в блюде.
-    Модель связывает Recipe и Ingredient с указанием количества ингридиента.
+    """
+    Количество ингридиентов в блюде.
+    Модель связывает Recipe и Ingredient
+    с указанием количества ингридиента.
     """
 
     recipe = models.ForeignKey(
@@ -117,7 +112,7 @@ class RecipeIngredient(models.Model):
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Количество ингридиентов'
         ordering = ('recipe',)
-        
+
     def __str__(self) -> str:
         return f"{self.amount} {self.ingredient}"
 
@@ -203,7 +198,7 @@ class Carts(models.Model):
 
     class Meta:
         verbose_name = 'Рецепт в списке покупок'
-        verbose_name_plural = 'Рецепты в списке покупок'   
+        verbose_name_plural = 'Рецепты в списке покупок'
 
     def __str__(self) -> str:
         return f"{self.user} -> {self.recipe}"

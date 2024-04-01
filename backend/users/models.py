@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models.functions import Length
 from django.utils.translation import gettext_lazy as _
 
-from reviews import texts, validators
+from reviews import texts
 from reviews.enums import Limits
 
 models.CharField.register_lookup(Length)

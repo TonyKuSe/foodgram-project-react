@@ -7,11 +7,10 @@ DATE_TIME_FORMAT = "%d/%m/%Y %H:%M"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECRET_KEY = 'django-insecure-cg6*%6d51ef8f#4!r3*$vmxm4)abgjw8mo!4y-q*uq1!4$-89$'
 SECRET_KEY = 'd5071bea3ec8160a9bf6a50f7a46f72834f83c0e'
 
 DEBUG = True
-# DEBUG = False
+
 
 # ALLOWED_HOSTS = ['51.250.25.35', 'food-contact.online']
 ALLOWED_HOSTS = ['*']
@@ -85,7 +84,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -100,7 +99,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ],
-    
+
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
@@ -109,7 +108,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': [
+        'rest_framework.pagination.PageNumberPagination',
+    ],
     'PAGE_SIZE': 6,
 }
 
@@ -135,12 +136,9 @@ USE_L10N = True
 
 
 MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_ROOT = BASE_DIR / MEDIA_URL
 
 STATIC_URL = '/static/'
-#STATIC_ROOT = BASE_DIR / 'static'
-# STATIC_ROOT = BASE_DIR / 'staticfiles' 'collected_static'
 STATIC_ROOT = BASE_DIR / 'static'
 
 

@@ -1,8 +1,7 @@
-from collections import OrderedDict
+
 
 from django.contrib.auth import get_user_model
 
-from django.shortcuts import get_object_or_404
 
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework import serializers
@@ -16,16 +15,20 @@ from djoser.serializers import SetPasswordSerializer
 
 User = get_user_model()
 
+
 class UserSetPasswordSerializer(SetPasswordSerializer):
     """Сериализатор для смены пароля"""
+
     new_password = serializers.CharField()
-    current_password =  serializers.CharField()
+    current_password = serializers.CharField()
+
     class Meta:
         model = User
-        fields = ( 
+        fields = (
            'new_password',
            'current_password'
         )
+
 
 class UserRetrieveSerializer(ModelSerializer):
     """Сериализатор для выыедения запрошенного пользователя"""
@@ -61,15 +64,17 @@ class UserRetrieveSerializer(ModelSerializer):
 
     def get_id(self, obj):
         return obj.id
-    
+
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
         if user.is_anonymous or (user == obj):
             return False
         return user.follower.filter(author=obj.id).exists()
 
+
 class UserMeSerializer(ModelSerializer):
     """Сериализатор для для выведения информации о текущем пользавтеле"""
+
     email = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
@@ -102,15 +107,17 @@ class UserMeSerializer(ModelSerializer):
 
     def get_id(self, obj):
         return obj.id
-    
+
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
         if user.is_anonymous or (user == obj):
             return False
         return user.follower.filter(author=obj.id).exists()
 
+
 class UserSerializer(ModelSerializer):
     """Сериализатор для создания пользователя"""
+
     class Meta:
         model = User
         fields = (
@@ -136,11 +143,13 @@ class UserSerializer(ModelSerializer):
         user.save()
         return user
 
+
 class RecipeForFollowSerializer(ModelSerializer):
-    """Сериализатор для выведения рецептов в подписках""" 
+    """Сериализатор для выведения рецептов в подписках"""
+
     class Meta:
         model = Recipe
-        fields =(
+        fields = (
             'id',
             'name',
             'image',
@@ -153,8 +162,10 @@ class RecipeForFollowSerializer(ModelSerializer):
             'cooking_time'
         ]
 
+
 class FollowSerializer(ModelSerializer):
-    """"""
+    """Сериализатор для выведения и создания подписок"""
+
     is_subscribed = SerializerMethodField()
     recipes = SerializerMethodField()
     recipes_count = SerializerMethodField()
@@ -170,7 +181,6 @@ class FollowSerializer(ModelSerializer):
             'is_subscribed',
             'recipes',
             'recipes_count',
-            
         )
         read_only_fields = [
 
@@ -193,7 +203,7 @@ class FollowSerializer(ModelSerializer):
     def get_recipes_count(self, obg):
         """Количество рецептов у автора"""
         return Recipe.objects.all().filter(author=obg.id).count()
-    
+
     def get_recipes(self, obg):
         """Массив объектов Recipe автора"""
         recipes = Recipe.objects.all().filter(author=obg.id)
@@ -209,7 +219,7 @@ class FollowSerializer(ModelSerializer):
         """Проверка подписок пользователя и автора."""
         user = self.context.get('request').user
         author = self.initial_data.get('author')
-        
+
         if user == author:
             raise serializers.ValidationError(
                 'Нельзя подписаться на самого себя.'
@@ -221,7 +231,7 @@ class FollowSerializer(ModelSerializer):
                 f'Вы уже подписаны на {author.username}.'
             )
         return data
-    
+
     def create(self, validated_data):
         """Создание подписок пользователя и автора"""
         author = validated_data.pop('author')
@@ -267,7 +277,7 @@ class ListUserSubscribeSerializer(UserSerializer):
     def get_recipes_count(self, obg):
         """Количество рецептов у автора"""
         return Recipe.objects.all().filter(author=obg.id).count()
-    
+
     def get_recipes(self, obg):
         """Массив объектов Recipe автора"""
         recipes = Recipe.objects.all().filter(author=obg.id)
@@ -278,7 +288,7 @@ class ListUserSubscribeSerializer(UserSerializer):
         )
         serializer.is_valid()
         return serializer.data
-    
+
     def get_is_subscribed(self, obj):
         """Проверка подписки пользователей."""
         return Subscriptions.objects.filter(

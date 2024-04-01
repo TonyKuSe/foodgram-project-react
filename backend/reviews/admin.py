@@ -1,23 +1,29 @@
 from django.contrib import admin
 
-from .models import (Favorites, Ingredient, Recipe, RecipeIngredient, Carts, Tag)
-from users.models import (Subscriptions) 
+from .models import (Favorites, Ingredient,
+                     Recipe, RecipeIngredient,
+                     Carts, Tag)
+from users.models import Subscriptions
 
 EMPTY_MSG = '-пусто-'
+
 
 class RecipeIngredientAdmin(admin.StackedInline):
     model = RecipeIngredient
     autocomplete_fields = ('ingredient',)
 
+
 class FavoritesAdmin(admin.StackedInline):
     model = Favorites
     autocomplete_fields = ('recipe',)
+
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
-        'id','name',
+        'id', 'name',
         'author', 'text',
-        'cooking_time', 
+        'cooking_time',
         'favorite_count',
         'tags', 'ingredients',
         'pub_date',)
@@ -70,7 +76,7 @@ class SubscriptionsAdmin(admin.ModelAdmin):
 @admin.register(Favorites)
 class FavoritesAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'user', 'get_recipe', 
+        'id', 'user', 'get_recipe',
         # 'get_count'
     )
     empty_value_display = EMPTY_MSG
@@ -103,4 +109,3 @@ class CartAdmin(admin.ModelAdmin):
                 f'{item["name"]} ' for item in obj.recipe if 'name' in item
             ]
         return 'Некорректный формат рецепта'
-
