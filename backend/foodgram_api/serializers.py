@@ -211,11 +211,11 @@ class RecipeSerializerList(ModelSerializer):
             recipe=recipe, user=self.context['request'].user).exists()
 
     def get_is_in_shopping_cart(self, recipe):
-        if Carts.objects.filter(
-            user=self.context['request'].user, recipe=recipe
-        ).exists():
-            return True
-        return False
+        # if Carts.objects.filter(
+        #     user=self.context['request'].user, recipe=recipe
+        # ).exists():
+        #     return True
+        return True
 
 
 class FavoritRecipeSerializer(ModelSerializer):
