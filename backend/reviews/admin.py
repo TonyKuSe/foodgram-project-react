@@ -9,7 +9,9 @@ class RecipeIngredientAdmin(admin.StackedInline):
     model = RecipeIngredient
     autocomplete_fields = ('ingredient',)
 
-
+class FavoritesAdmin(admin.StackedInline):
+    model = Favorites
+    autocomplete_fields = ('recipe',)
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
@@ -23,7 +25,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'name', 'cooking_time',
         'author__email', 'ingredients__name')
     list_filter = ('pub_date', 'tags',)
-    inlines = (RecipeIngredientAdmin,)
+    inlines = (RecipeIngredientAdmin, FavoritesAdmin)
     empty_value_display = EMPTY_MSG
 
     @admin.display(description='Тэги')
@@ -34,9 +36,9 @@ class RecipeAdmin(admin.ModelAdmin):
     def ingredients(self, obj):
         return obj.ingredients.name
 
-    # @admin.display(description='В избранном')
-    # def favorite_count(self, kwags):
-    #     return kwags.favorite_recipe.count()
+    @admin.display(description='В избранном')
+    def favorite_count(self, kwags):
+        return kwags.favorite_recipe.count()
 
 
 @admin.register(Tag)

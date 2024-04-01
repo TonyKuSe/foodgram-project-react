@@ -117,8 +117,8 @@ DJOSER = {
     "LOGIN_FIELD": "email",
     "HIDE_USERS": False,
     "PERMISSIONS": {
-        'resipe': ("foodgram_api.permissions.IsAuthenticated,",),
-        'recipe_list': ("foodgram_api.permissions.AllowAny",),
+        # 'resipe': ("foodgram_api.permissions.IsAuthenticated,",),
+        # 'recipe_list': ("foodgram_api.permissions.AllowAny",),
         'user': ("foodgram_api.permissions.IsAuthenticated",),
         'user_list': ("foodgram_api.permissions.AllowAny",),
         'subscribe': ("foodgram_api.permissions.IsAuthenticated",),
