@@ -119,7 +119,7 @@ DJOSER = {
     "PERMISSIONS": {
         'resipe': ("foodgram_api.permissions.IsAuthenticated,",),
         'recipe_list': ("foodgram_api.permissions.AllowAny",),
-        'user': ("foodgram_api.permissions.IsAuthenticated",),
+        'user': ("foodgram_api.permissions.AuthorStaffOrReadOnly",),
         'user_list': ("foodgram_api.permissions.AllowAny",),
         'subscribe': ("foodgram_api.permissions.IsAuthenticated",),
         'subscriptions': ("foodgram_api.permissions.IsAuthenticated",),
