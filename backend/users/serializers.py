@@ -21,8 +21,8 @@ class UserSetPasswordSerializer(SetPasswordSerializer):
     class Meta:
         model = User
         fields = (
-           'new_password',
-           'current_password'
+            'new_password',
+            'current_password'
         )
 
 

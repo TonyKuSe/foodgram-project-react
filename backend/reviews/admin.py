@@ -81,7 +81,7 @@ class FavoritesAdmin(admin.ModelAdmin):
         if isinstance(obj.recipe, list):
             return [
                 f'{item["name"]} ' for item in obj.recipe if 'name' in item
-                ]
+            ]
         return 'Некорректный формат рецепта'
 
 

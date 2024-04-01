@@ -75,7 +75,8 @@ class FiedIngredientsList(serializers.Field):
         recipe_id = value.core_filters
         ingredient = Ingredient.objects.all().filter(
             recipe=recipe_id['recipe__id']).values(
-             "id", "name", "measurement_unit", 'rec_ingredient__amount')
+                "id", "name", "measurement_unit", 'rec_ingredient__amount'
+            )
         ingredients = []
         for i in ingredient:
             ingredients.append({
@@ -210,11 +211,11 @@ class RecipeSerializerList(ModelSerializer):
             recipe=recipe, user=self.context['request'].user).exists()
 
     def get_is_in_shopping_cart(self, recipe):
-        if self.context['request'].user.is_anonymous:
-            return False
-        return Carts.objects.filter(
+        if Carts.objects.filter(
             user=self.context['request'].user, recipe=recipe
-        ).exists()
+        ).exists():
+            return True
+        return False
 
 
 class FavoritRecipeSerializer(ModelSerializer):
@@ -244,8 +245,9 @@ class FavoritRecipeSerializer(ModelSerializer):
         user = validated_data.pop('user')
         recipe = validated_data.pop('recipe')
         Favorites.objects.create(
-                recipe=recipe,
-                user=user)
+            recipe=recipe,
+            user=user
+        )
         return recipe
 
 
@@ -276,6 +278,7 @@ class CartsRecipeSerializer(ModelSerializer):
         user = validated_data.pop('user')
         recipe = validated_data.pop('recipe')
         Carts.objects.get_or_create(
-                recipe=recipe,
-                user=user)
+            recipe=recipe,
+            user=user
+        )
         return recipe
