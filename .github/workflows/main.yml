@@ -46,7 +46,7 @@ jobs:
             with:
                 context: frontend/
                 push: true
-                tags: toniku/foodgram_frontend:latest
+                tags: toniku/food_frontend:latest
     deploy:
         name: Deploy
         runs-on: ubuntu-20.04
@@ -66,6 +66,7 @@ jobs:
                   sudo docker compose -f docker-compose.yml pull
                   # Перезапускает все контейнеры в Docker Compose
                   sudo docker compose -f docker-compose.yml down
+                  sudo docker system prune -a
                   sudo docker compose -f docker-compose.yml up -d
                   # Выполняет миграции и сбор статики
                   sudo docker compose -f docker-compose.yml exec backend python manage.py migrate
