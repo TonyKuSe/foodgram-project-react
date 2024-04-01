@@ -13,11 +13,6 @@ class RecipeIngredientAdmin(admin.StackedInline):
     autocomplete_fields = ('ingredient',)
 
 
-class FavoritesAdmin(admin.StackedInline):
-    model = Favorites
-    autocomplete_fields = ('recipe',)
-
-
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
@@ -31,7 +26,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'name', 'cooking_time',
         'author__email', 'ingredients__name')
     list_filter = ('pub_date', 'tags',)
-    inlines = (RecipeIngredientAdmin, FavoritesAdmin)
+    inlines = (RecipeIngredientAdmin,)
     empty_value_display = EMPTY_MSG
 
     @admin.display(description='Тэги')
@@ -77,7 +72,6 @@ class SubscriptionsAdmin(admin.ModelAdmin):
 class FavoritesAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'user', 'get_recipe',
-        # 'get_count'
     )
     empty_value_display = EMPTY_MSG
 
@@ -89,11 +83,6 @@ class FavoritesAdmin(admin.ModelAdmin):
                 f'{item["name"]} ' for item in obj.recipe if 'name' in item
                 ]
         return 'Некорректный формат рецепта'
-
-    # @admin.display(
-    #     description='В избранных')
-    # def get_count(self, obj):
-    #     return obj.recipe.count()
 
 
 @admin.register(Carts)

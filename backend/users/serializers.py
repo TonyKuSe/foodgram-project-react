@@ -1,14 +1,10 @@
-
-
 from django.contrib.auth import get_user_model
-
 
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework import serializers
 
 from reviews.models import Recipe
 from users.models import Subscriptions
-# from rest_framework.validators import UniqueTogetherValidator
 
 from djoser.serializers import SetPasswordSerializer
 
@@ -31,7 +27,7 @@ class UserSetPasswordSerializer(SetPasswordSerializer):
 
 
 class UserRetrieveSerializer(ModelSerializer):
-    """Сериализатор для выыедения запрошенного пользователя"""
+    """Сериализатор для выведения запрошенного пользователя"""
     email = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()

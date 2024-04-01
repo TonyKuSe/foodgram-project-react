@@ -171,6 +171,7 @@ class RecipeSerializer(ModelSerializer):
 
 class RecipeSerializerList(ModelSerializer):
     """Сериализатор для выведения всех рецептов."""
+
     author = UserSerializer(many=False)
     tags = TagSerializer(many=True)
     ingredients = FiedIngredientsList()
@@ -209,7 +210,11 @@ class RecipeSerializerList(ModelSerializer):
             recipe=recipe, user=self.context['request'].user).exists()
 
     def get_is_in_shopping_cart(self, recipe):
-        return Carts.objects.all().filter(recipe=recipe).exists()
+        if self.context['request'].user.is_anonymous:
+            return False
+        return Carts.objects.filter(
+            user=self.context['request'].user, recipe=recipe
+        ).exists()
 
 
 class FavoritRecipeSerializer(ModelSerializer):
