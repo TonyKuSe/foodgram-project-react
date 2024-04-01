@@ -173,7 +173,8 @@ class FavoritViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         recipe_id = self.kwargs.get('recipe_id')
-        new_queryset = Favorites.objects.select_related('recipe', 'user').filter(recipe=recipe_id)
+        new_queryset = Favorites.objects.select_related(
+            'recipe', 'user').filter(recipe=recipe_id)
         return new_queryset
     
     def perform_create(self, serializer):

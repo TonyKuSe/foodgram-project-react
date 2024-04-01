@@ -10,8 +10,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = 'django-insecure-cg6*%6d51ef8f#4!r3*$vmxm4)abgjw8mo!4y-q*uq1!4$-89$'
 SECRET_KEY = 'd5071bea3ec8160a9bf6a50f7a46f72834f83c0e'
 
-DEBUG = True
-#DEBUG = False
+# DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS = ['51.250.25.35', 'food-contact.online']
 ALLOWED_HOSTS = ['*']
