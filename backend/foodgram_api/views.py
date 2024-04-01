@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.db.models.aggregates import Sum
 from django.contrib.auth import get_user_model
+
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import status, viewsets, filters
 from rest_framework.decorators import action
@@ -125,9 +126,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (AuthorStaffOrReadOnly,)
 
     def get_serializer_class(self):
-        if self.action == 'create' or 'update':
-            return RecipeSerializer
-        return RecipeSerializerList
+        if self.action == 'list':
+            return RecipeSerializerList
+        return RecipeSerializer
+       
 
     def perform_create(self, serializer):
         serializer.save(
