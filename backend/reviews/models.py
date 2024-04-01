@@ -43,7 +43,6 @@ class Recipe(models.Model):
     image = models.ImageField(
         verbose_name='Изображение блюда',
         upload_to='recipe/images/',
-        # TODO кодировка картинки в Base64
     )
     text = models.TextField(
         verbose_name='Описание блюда',
