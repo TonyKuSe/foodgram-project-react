@@ -193,7 +193,7 @@ class RecipeSerializerList(ModelSerializer):
         )
 
     def get_is_favorited(self, recipe):
-        return Favorites.objects.all().filter(recipe=recipe).exists()
+        return Favorites.objects.filter(recipe=recipe).exists()
 
     def get_is_in_shopping_cart(self, recipe):
         return Carts.objects.all().filter(recipe=recipe).exists()

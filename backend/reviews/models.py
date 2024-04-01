@@ -87,8 +87,8 @@ class Ingredient(models.Model):
         return f"{self.name} {self.measurement_unit}"
 
 
-    def __str__(self) -> str:
-        return f"{self.name}"
+    # def __str__(self) -> str:
+    #     return f"{self.name}"
 
 
 class RecipeIngredient(models.Model):
@@ -203,8 +203,7 @@ class Carts(models.Model):
 
     class Meta:
         verbose_name = 'Рецепт в списке покупок'
-        verbose_name_plural = 'Рецепты в списке покупок'
-        
+        verbose_name_plural = 'Рецепты в списке покупок'   
 
     def __str__(self) -> str:
         return f"{self.user} -> {self.recipe}"
