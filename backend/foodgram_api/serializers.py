@@ -215,7 +215,7 @@ class RecipeSerializerList(ModelSerializer):
         #     user=self.context['request'].user, recipe=recipe
         # ).exists():
         #     return True
-        return True
+        return False
 
 
 class FavoritRecipeSerializer(ModelSerializer):
