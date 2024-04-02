@@ -126,10 +126,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     # queryset = Recipe.objects.all()
     permission_classes = (AuthorStaffOrReadOnly,)
+    
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('author', 'tags__name')
-    
+
+
     def get_queryset(self):
         queryset = Recipe.objects.all()
         if self.request.query_params.get('is_in_shopping_cart') is not None:
