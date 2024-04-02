@@ -1,8 +1,9 @@
 from django.http import HttpResponse
 from django.db.models.aggregates import Sum
 from django.contrib.auth import get_user_model
-
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
+
 from rest_framework import status, viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -126,12 +127,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
     # queryset = Recipe.objects.all()
     permission_classes = (AuthorStaffOrReadOnly,)
     pagination_class = LimitOffsetPagination
-    
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('author', 'tags')
     
     def get_queryset(self):
         queryset = Recipe.objects.all()
         if self.request.query_params.get('is_in_shopping_cart') is not None:
             queryset = queryset.filter(carts__user=self.request.user)
+            return queryset
+        elif self.request.query_params.get('is_favorited') is not None:
+            queryset = queryset.filter(favorites__user=self.request.user)
+            return queryset
+        elif self.request.query_params.get('tags') is not None:
             return queryset
         return queryset
 
