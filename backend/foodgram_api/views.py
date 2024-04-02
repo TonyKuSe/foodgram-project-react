@@ -128,7 +128,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (AuthorStaffOrReadOnly,)
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('author', 'tags')
+    filterset_fields = ('author', 'tags__name')
     
     def get_queryset(self):
         queryset = Recipe.objects.all()
@@ -138,8 +138,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         elif self.request.query_params.get('is_favorited') is not None:
             queryset = queryset.filter(favorites__user=self.request.user)
             return queryset
-        elif self.request.query_params.get('tags') is not None:
-            return queryset
+        # elif self.request.query_params.get('tags') is not None:
+        #     return queryset
         return queryset
 
     def get_serializer_class(self):
