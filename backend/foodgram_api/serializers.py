@@ -215,7 +215,6 @@ class RecipeSerializerList(ModelSerializer):
             user=self.context['request'].user, recipe=recipe).exists())
 
 
-
 class FavoritRecipeSerializer(ModelSerializer):
     id = serializers.IntegerField(required=False,)
     name = serializers.CharField(required=False)

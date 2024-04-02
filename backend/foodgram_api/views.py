@@ -122,14 +122,21 @@ class IngredientViewSet(viewsets.ModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет работет с Recipe."""
-    queryset = Recipe.objects.all()
+
+  
     permission_classes = (AuthorStaffOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action == 'list':
             return RecipeSerializerList
         return RecipeSerializer
-       
+    
+    def get_queryset(self):
+        queryset = Recipe.objects.all()
+        is_in_shopping_cart = self.kwargs['is_in_shopping_cart']
+        queryset = queryset.filter(is_in_shopping_cart=is_in_shopping_cart)
+        queryset = queryset
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(
