@@ -59,7 +59,7 @@ class Recipe(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self) -> str:
-        return f'{self.name}. Автор: {self.author}'
+        return f'{self.name} {self.id}'
 
 
 class Ingredient(models.Model):
