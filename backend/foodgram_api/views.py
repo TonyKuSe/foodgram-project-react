@@ -138,8 +138,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         elif self.request.query_params.get('is_favorited') is not None:
             queryset = queryset.filter(favorites__user=self.request.user)
             return queryset
-        # elif self.request.query_params.get('tags') is not None:
-        #     return queryset
         return queryset
 
     def get_serializer_class(self):
