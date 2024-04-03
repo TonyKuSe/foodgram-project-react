@@ -135,25 +135,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Recipe.objects.all()
         if self.request.query_params.get('is_in_shopping_cart') is not None:
-            queryset = queryset.filter(carts__user=self.request.user)
-            return queryset
+            return queryset.filter(carts__user=self.request.user)
         elif self.request.query_params.get('is_favorited') is not None:
-            queryset = queryset.filter(favorites__user=self.request.user)
-            return queryset
+            tags = self.request.query_params.getlist('tags')
+            if not tags:
+                return queryset.filter(favorites__user=self.request.user)
+            return queryset.filter(favorites__user=self.request.user, tags__slug__in=tags)
         elif self.request.query_params.get('tags') is not None:
             tags = self.request.query_params.getlist('tags')
-            # tags_dict = {
-            #     'breakfast': '0',
-            #     'inner': '1',
-            #     'supper': '2'
-            # }
-            # tag = [0, 1, 2,]
-            # queryset_list = list()
-            # for tag in tags:
-            #     queryset_list = queryset.filter(tags=tags_dict[tag])
-            # queryset = queryset_list
-            queryset = queryset.filter(tags__slug__in=tags)
-            return queryset
+            return queryset.filter(tags__slug__in=tags)
         return queryset
 
     def get_serializer_class(self):
