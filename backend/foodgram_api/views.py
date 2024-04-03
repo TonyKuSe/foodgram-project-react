@@ -129,7 +129,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('author', 'tags__name')
+    filterset_fields = ('author',)
 
 
     def get_queryset(self):
@@ -139,6 +139,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return queryset
         elif self.request.query_params.get('is_favorited') is not None:
             queryset = queryset.filter(favorites__user=self.request.user)
+            return queryset
+        elif self.request.query_params.get('tags') is not None:
+            tags = list(self.request.query_params.get('tags'))
+            # tags_list = [value for key, value in self.request.query_params.items() if key == 'tags']
+            for tag in tags:
+                queryset = queryset.filter(tags__name=tag)
             return queryset
         return queryset
 
