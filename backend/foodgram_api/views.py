@@ -141,10 +141,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(favorites__user=self.request.user)
             return queryset
         elif self.request.query_params.get('tags') is not None:
-            tags = list(self.request.query_params.get('tags'))
-            # tags_list = [value for key, value in self.request.query_params.items() if key == 'tags']
-            for tag in tags:
-                queryset = queryset.filter(tags__name=tag)
+            tags = self.request.query_params.getlist('tags')
+            # tags_dict = {
+            #     'breakfast': '0',
+            #     'inner': '1',
+            #     'supper': '2'
+            # }
+            # tag = [0, 1, 2,]
+            # queryset_list = list()
+            # for tag in tags:
+            #     queryset_list = queryset.filter(tags=tags_dict[tag])
+            # queryset = queryset_list
+            queryset = queryset.filter(tags__slug__in=tags)
             return queryset
         return queryset
 
