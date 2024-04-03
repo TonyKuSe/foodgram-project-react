@@ -1,12 +1,11 @@
 from django.contrib.auth import get_user_model
-
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework import serializers
 
+from djoser.serializers import SetPasswordSerializer
+
 from reviews.models import Recipe
 from users.models import Subscriptions
-
-from djoser.serializers import SetPasswordSerializer
 
 
 User = get_user_model()
@@ -28,6 +27,7 @@ class UserSetPasswordSerializer(SetPasswordSerializer):
 
 class UserRetrieveSerializer(ModelSerializer):
     """Сериализатор для выведения запрошенного пользователя"""
+
     email = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
@@ -169,22 +169,22 @@ class FollowSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = (
-            "email",
-            "id",
-            "username",
-            "first_name",
-            "last_name",
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
             'is_subscribed',
             'recipes',
             'recipes_count',
         )
         read_only_fields = [
 
-            "email",
-            "id",
-            "username",
-            "first_name",
-            "last_name",
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
             'is_subscribed',
             'recipes',
             'recipes_count'
@@ -242,6 +242,7 @@ class FollowSerializer(ModelSerializer):
 
 class ListUserSubscribeSerializer(UserSerializer):
     """Сериализатор для выведения подписок"""
+
     email = serializers.EmailField(
         source='author.email')
     id = serializers.IntegerField(

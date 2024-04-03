@@ -32,7 +32,7 @@ class ShortRecipeSerializer(ModelSerializer):
     """Сериализатор для показа модели Recipe."""
     class Meta:
         model = Recipe
-        fields = ("id", "name", "image", "cooking_time")
+        fields = ('id', 'name', 'image', 'cooking_time')
         read_only_fields = ("__all__",)
 
 
@@ -52,7 +52,7 @@ class TagSerializer(ModelSerializer):
 
 
 class IngredientSerializer(ModelSerializer):
-
+    """Сериализатор для ингридиентов."""
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
@@ -60,7 +60,7 @@ class IngredientSerializer(ModelSerializer):
 
 
 class CreateRecipeIngredientSerializer(ModelSerializer):
-
+    """Сериализатор для рецептов и ингридиентов."""
     id = serializers.IntegerField()
 
     class Meta:
@@ -75,8 +75,8 @@ class FiedIngredientsList(serializers.Field):
         recipe_id = value.core_filters
         ingredient = Ingredient.objects.all().filter(
             recipe=recipe_id['recipe__id']).values(
-                "id", "name", "measurement_unit", 'rec_ingredient__amount'
-            )
+                'id', 'name', 'measurement_unit', 'rec_ingredient__amount'
+                )
         ingredients = []
         for i in ingredient:
             ingredients.append({
@@ -220,6 +220,7 @@ class RecipeSerializerList(ModelSerializer):
 
 
 class FavoritRecipeSerializer(ModelSerializer):
+    """Сериализатор для избраного."""
     id = serializers.IntegerField(required=False,)
     name = serializers.CharField(required=False)
     image = Base64ImageField(
@@ -253,6 +254,7 @@ class FavoritRecipeSerializer(ModelSerializer):
 
 
 class CartsRecipeSerializer(ModelSerializer):
+    """Сериализатор для работы корзины."""
     id = serializers.IntegerField(required=False)
     name = serializers.CharField(required=False)
     image = Base64ImageField(

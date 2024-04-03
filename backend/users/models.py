@@ -59,7 +59,6 @@ class FoodUser(AbstractUser):
 
     def __str__(self) -> str:
         return f'{self.email}, {self.username}'
-    # return '%d: %s' % (self.email, self.username)
 
 
 class Subscriptions(models.Model):
@@ -97,4 +96,4 @@ class Subscriptions(models.Model):
         )
 
     def __str__(self) -> str:
-        return f'{self.user.id} подписан {self.author.id}'
+        return f'{self.user} подписан {self.author}'
