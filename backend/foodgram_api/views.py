@@ -124,13 +124,11 @@ class IngredientViewSet(viewsets.ModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет работет с Recipe."""
 
-    # queryset = Recipe.objects.all()
     permission_classes = (AuthorStaffOrReadOnly,)
-    
     pagination_class = LimitOffsetPagination
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_fields = ('author',)
-
+    search_fields = ('ingredient__name',)
 
     def get_queryset(self):
         queryset = Recipe.objects.all()
@@ -140,7 +138,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             tags = self.request.query_params.getlist('tags')
             if not tags:
                 return queryset.filter(favorites__user=self.request.user)
-            return queryset.filter(favorites__user=self.request.user, tags__slug__in=tags)
+            return queryset.filter(
+                favorites__user=self.request.user,
+                tags__slug__in=tags
+            )
         elif self.request.query_params.get('tags') is not None:
             tags = self.request.query_params.getlist('tags')
             return queryset.filter(tags__slug__in=tags)
