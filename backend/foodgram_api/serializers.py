@@ -75,8 +75,7 @@ class FiedIngredientsList(serializers.Field):
         recipe_id = value.core_filters
         ingredient = Ingredient.objects.all().filter(
             recipe=recipe_id['recipe__id']).values(
-                'id', 'name', 'measurement_unit', 'rec_ingredient__amount'
-                )
+                'id', 'name', 'measurement_unit', 'rec_ingredient__amount')
         ingredients = []
         for i in ingredient:
             ingredients.append({
