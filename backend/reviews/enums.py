@@ -15,7 +15,6 @@ class Tuples(tuple, Enum):
 class Limits(IntEnum):
     DEF_NUM = 0
     DEF_MIN_LEN = 1
-    # TODO сделать константы универсальные через словарь
     MAX_LEN_EMAIL = 256
     MAX_LEN_USERNAME = 150
     MAX_LEN_FIRST_NAME = 150
@@ -23,7 +22,7 @@ class Limits(IntEnum):
     MAX_LEN_NAME = 200
     MAX_LEN_TEXTFIELD = 2000
     MIN_COOKING_TIME = 0
-    MAX_COOKING_TIME = 2000
+    MAX_COOKING_TIME = 32000
     MAX_LEN_CHARFIELD_ING = 200
     MAX_LEN_CHARFIELD = 200
     DEF_MAX_LEN = 7
