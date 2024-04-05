@@ -1,19 +1,19 @@
 from django.http import HttpResponse
 from django.db.models.aggregates import Sum
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
-
 from rest_framework import status, viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+
 from reviews.models import (Carts, Favorites,
                             Ingredient, Recipe,
                             Tag, RecipeIngredient)
 from users.models import Subscriptions
-from django.shortcuts import get_object_or_404
-
 from .permissions import AuthorStaffOrReadOnly, AdminOrReadOnly
 from users.serializers import (ListUserSubscribeSerializer, UserMeSerializer,
                                UserSerializer, UserRetrieveSerializer,
@@ -21,9 +21,18 @@ from users.serializers import (ListUserSubscribeSerializer, UserMeSerializer,
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           RecipeSerializerList, FavoritRecipeSerializer,
                           CartsRecipeSerializer, TagSerializer)
-
 from rest_framework.pagination import LimitOffsetPagination
+
+
 User = get_user_model()
+
+
+SERIALIZER_CLASSES = {
+    'retrieve': UserRetrieveSerializer,
+    'set_password': UserSetPasswordSerializer,
+    'me': UserMeSerializer,
+    'list': UserRetrieveSerializer,
+}
 
 
 class UserViewSet(DjoserUserViewSet):
@@ -38,19 +47,10 @@ class UserViewSet(DjoserUserViewSet):
 
     def get_object(self):
         id = self.kwargs.get('id')
-        obj = get_object_or_404(User, id=id)
-        return obj
+        return get_object_or_404(User, id=id)
 
     def get_serializer_class(self):
-        if self.action == 'retrieve' and self.request.data is not None:
-            return UserRetrieveSerializer
-        elif self.action == 'set_password':
-            return UserSetPasswordSerializer
-        elif self.action == 'me':
-            return UserMeSerializer
-        elif self.action == 'list':
-            return UserRetrieveSerializer
-        return UserSerializer
+        return SERIALIZER_CLASSES.get(self.action, UserSerializer)
 
     @action(
         detail=True,
@@ -95,7 +95,7 @@ class UserViewSet(DjoserUserViewSet):
         на которых подписан пользователь
         """
         user = request.user
-        queryset = Subscriptions.objects.filter(user=user)
+        queryset = user.publisher.all()
         pages = self.paginate_queryset(queryset)
         serializer = ListUserSubscribeSerializer(
             pages, many=True,
@@ -134,7 +134,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         queryset = Recipe.objects.all()
         if self.request.query_params.get('is_in_shopping_cart') is not None:
             return queryset.filter(carts__user=self.request.user)
-        elif self.request.query_params.get('is_favorited') is not None:
+        if self.request.query_params.get('is_favorited') is not None:
             tags = self.request.query_params.getlist('tags')
             if not tags:
                 return queryset.filter(favorites__user=self.request.user)
@@ -159,7 +159,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(methods=("get",), detail=False)
     def download_shopping_cart(self, request):
         """Загружает файл со списком покупок"""
-        text_final = list()
+        text_final = []
         recipe_ingred = RecipeIngredient.objects.filter(
             recipe__carts__user=self.request.user.id).values(
                 'ingredient__name', 'ingredient__measurement_unit').annotate(
@@ -171,10 +171,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 f'- {text.setdefault("amount",["Нет массы"])} '
             )
             text_final.append(text_f)
-        response = HttpResponse(
+        return HttpResponse(
             text_final, content_type="text.txt; charset=utf-8"
         )
-        return response
 
 
 class FavoritViewSet(viewsets.ModelViewSet):
@@ -184,9 +183,8 @@ class FavoritViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         recipe_id = self.kwargs.get('recipe_id')
-        new_queryset = Favorites.objects.select_related(
+        return Favorites.objects.select_related(
             'recipe', 'user').filter(recipe=recipe_id)
-        return new_queryset
 
     def perform_create(self, serializer):
         recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))

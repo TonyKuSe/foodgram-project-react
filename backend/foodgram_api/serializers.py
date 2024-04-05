@@ -107,9 +107,6 @@ class RecipeSerializer(ModelSerializer):
         user = self.context['request'].user
         if user.is_anonymous:
             return False
-        # x = Favorites.objects.filter(
-        #     recipe=recipe, user=self.context['request'].user)
-        # c = user.favorites.all()
         return user.favorites.all().exists()
 
     def get_is_in_shopping_cart(self, recipe):
@@ -121,10 +118,20 @@ class RecipeSerializer(ModelSerializer):
     def create_ingredients(self, recipe, ingredients,):
         recipe_ingredients = []
         for ingredient in ingredients:
+            amount = ingredient['amount']
+            if (
+                amount < Limits.MIN_AMOUNT_INGREDIENTS
+                or amount > Limits.MAX_AMOUNT_INGREDIENTS
+            ):
+                raise ValueError(
+                    f'Значение amount должно быть от '
+                    f'{Limits.MIN_AMOUNT_INGREDIENTS} до '
+                    f'{Limits.MAX_AMOUNT_INGREDIENTS}.'
+                )
             recipe_ingredient = RecipeIngredient(
                 recipe=recipe,
                 ingredient_id=ingredient['id'],
-                amount=ingredient['amount']
+                amount=amount
             )
             recipe_ingredients.append(recipe_ingredient)
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
@@ -200,8 +207,7 @@ class RecipeSerializerList(ModelSerializer):
         user = self.context['request'].user
         if user.is_anonymous:
             return False
-        return user.favorites.filter(
-            recipe=recipe).exists()
+        return user.favorites.all().exists()
 
     def get_is_in_shopping_cart(self, recipe):
         user = self.context['request'].user

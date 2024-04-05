@@ -28,7 +28,7 @@ class Limits(IntEnum):
     DEF_MAX_LEN = 7
     MAX_MEASUREMENT_UNIT = 20
     MIN_AMOUNT_INGREDIENTS = 1
-    MAX_AMOUNT_INGREDIENTS = 38
+    MAX_AMOUNT_INGREDIENTS = 32000
 
 
 class UrlQueries(str, Enum):
