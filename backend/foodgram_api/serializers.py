@@ -60,43 +60,6 @@ class IngredientSerializer(ModelSerializer):
         fields = ('id', 'name', 'measurement_unit')
         read_only_fields = ('id', 'name', 'measurement_unit')
 
-# class FiedIngredientsList(serializers.Field): 
-
- 
-
-#     def to_representation(self, value): 
-
-#         recipe_id = value.core_filters 
-
-#         ingredient = Ingredient.objects.all().filter( 
-
-#             recipe=recipe_id['recipe__id']).values( 
-
-#                 'id', 'name', 'measurement_unit', 'rec_ingredient__amount') 
-
-#         ingredients = [] 
-
-#         for i in ingredient: 
-
-#             ingredients.append({ 
-
-#                 'id': i['id'], 
-
-#                 'name': i['name'], 
-
-#                 'measurement_unit': i['measurement_unit'], 
-
-#                 'amount': i['rec_ingredient__amount'] 
-
-#             }) 
-
-#         return ingredients 
-
- 
-
-    # def to_internal_value(self, data): 
-
-    #     return data 
 
 class RecipeSerializer(ModelSerializer):
     """Сериализатор для рецептов."""
@@ -104,7 +67,6 @@ class RecipeSerializer(ModelSerializer):
     author = UserSerializer(many=False, required=False)
     tags = TagSerializer(many=True, read_only=True)
     ingredients = SerializerMethodField()
-    # ingredients = FiedIngredientsList() 
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
     image = Base64ImageField(
