@@ -118,7 +118,7 @@ class RecipeSerializer(ModelSerializer):
     def create_ingredients(self, recipe, ingredients,):
         recipe_ingredients = []
         for ingredient in ingredients:
-            amount = ingredient['amount']
+            amount = int(ingredient['amount'])
             if (
                 amount < Limits.MIN_AMOUNT_INGREDIENTS
                 or amount > Limits.MAX_AMOUNT_INGREDIENTS
