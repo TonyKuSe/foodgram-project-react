@@ -128,9 +128,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     permission_classes = (AuthorStaffOrReadOnly,)
     pagination_class = LimitOffsetPagination
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('author',)
-    search_fields = ('ingredient__name',)
 
     def get_queryset(self):
         queryset = Recipe.objects.all()
@@ -146,7 +145,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
         elif self.request.query_params.get('tags') is not None:
             tags = self.request.query_params.getlist('tags')
-            return queryset.filter(tags__slug__in=tags)
+            return queryset.filter(tags__slug__in=tags).distinct()
         return queryset
 
     def get_serializer_class(self):
