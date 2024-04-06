@@ -1,6 +1,5 @@
 import base64
 from collections import OrderedDict
-from django.shortcuts import get_object_or_404
 
 from django.db.models import F
 from django.contrib.auth import get_user_model
@@ -154,48 +153,33 @@ class RecipeSerializer(ModelSerializer):
             return False
         return user.carts.all().exists()
 
-    # def create_ingredients(self, recipe, ingredients,):
-    #     recipe_ingredients = []
-    #     for ingredient in ingredients:
-    #         amount = ingredient['amount']
-    #         if (
-    #             amount < Limits.MIN_AMOUNT_INGREDIENTS
-    #             or amount > Limits.MAX_AMOUNT_INGREDIENTS
-    #         ):
-    #             raise ValueError(
-    #                 f'Значение amount должно быть от '
-    #                 f'{Limits.MIN_AMOUNT_INGREDIENTS} до '
-    #                 f'{Limits.MAX_AMOUNT_INGREDIENTS}.'
-    #             )
-    #         recipe_ingredient = RecipeIngredient(
-    #             recipe=recipe,
-    #             ingredient_id=ingredient['id'],
-    #             amount=amount
-    #         )
-    #         recipe_ingredients.append(recipe_ingredient)
-    #     RecipeIngredient.objects.bulk_create(recipe_ingredients)
+    def create_ingredients(self, recipe, ingredients,):
+        recipe_ingredients = []
+        for ingredient in ingredients:
+            amount = ingredient['amount']
+            if (
+                amount < Limits.MIN_AMOUNT_INGREDIENTS
+                or amount > Limits.MAX_AMOUNT_INGREDIENTS
+            ):
+                raise ValueError(
+                    f'Значение amount должно быть от '
+                    f'{Limits.MIN_AMOUNT_INGREDIENTS} до '
+                    f'{Limits.MAX_AMOUNT_INGREDIENTS}.'
+                )
+            recipe_ingredient = RecipeIngredient(
+                recipe=recipe,
+                ingredient_id=ingredient['id'],
+                amount=amount
+            )
+            recipe_ingredients.append(recipe_ingredient)
+        RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
     def create(self, validated_data):
         ingredients = self.initial_data.pop('ingredients')
         tags = self.initial_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        # self.create_ingredients(recipe, ingredients)
-        for ingredient in ingredients: 
-
-            current_ingredient = get_object_or_404( 
-
-                Ingredient, id=ingredient['id'] 
-
-            ) 
-
-            RecipeIngredient.objects.create( 
-
-                recipe_id=recipe.id, 
-
-                ingredient_id=current_ingredient.id, 
-
-                amount=ingredient['amount']) 
+        self.create_ingredients(recipe, ingredients)
         return recipe
 
     def update(self, instance, validated_data):
