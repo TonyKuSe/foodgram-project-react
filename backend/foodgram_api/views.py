@@ -21,7 +21,6 @@ from users.serializers import (ListUserSubscribeSerializer, UserMeSerializer,
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           RecipeSerializerList, FavoritRecipeSerializer,
                           CartsRecipeSerializer, TagSerializer)
-from rest_framework.pagination import LimitOffsetPagination
 
 
 User = get_user_model()
@@ -127,7 +126,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет работет с Recipe."""
 
     permission_classes = (AuthorStaffOrReadOnly,)
-    pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('author',)
 
