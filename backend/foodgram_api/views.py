@@ -140,7 +140,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return queryset.filter(
                 favorites__user=self.request.user,
                 tags__slug__in=tags
-            )
+            ).distinct()
         elif self.request.query_params.get('tags') is not None:
             tags = self.request.query_params.getlist('tags')
             return queryset.filter(tags__slug__in=tags).distinct()
