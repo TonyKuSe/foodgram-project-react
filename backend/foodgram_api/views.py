@@ -54,7 +54,7 @@ class UserViewSet(DjoserUserViewSet):
     @action(
         detail=True,
         methods=['POST'],
-        permission_classes=(AllowAny,)
+        permission_classes=(IsAuthenticated,)
     )
     def subscribe(self, request, **kwargs):
         """Подписаться на пользователя."""
