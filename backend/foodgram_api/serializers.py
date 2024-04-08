@@ -218,15 +218,23 @@ class RecipeSerializerList(ModelSerializer):
 
 class FavoritRecipeSerializer(ModelSerializer):
     """Сериализатор для избраного."""
-    id = serializers.IntegerField(required=False,)
-    name = serializers.CharField(required=False)
+    id = serializers.IntegerField(
+        source='recipe.id', required=False
+    )
+    name = serializers.CharField(
+        source='recipe.name', required=False
+    )
     image = Base64ImageField(
+        source='recipe.name',
         required=False, allow_null=True
     )
-    cooking_time = serializers.IntegerField(required=False)
+    cooking_time = serializers.IntegerField(
+        source='recipe.cooking_time',
+        required=False
+    )
 
     class Meta:
-        model = Recipe
+        model = Favorites
         fields = (
             'id',
             'name',
@@ -240,20 +248,15 @@ class FavoritRecipeSerializer(ModelSerializer):
             'cooking_time',
         )
 
-    def create(self, validated_data):
-        user = validated_data.pop('user')
-        recipe = validated_data.pop('recipe')
-        Favorites.objects.create(
-            recipe=recipe,
-            user=user
-        )
-        return recipe
-
 
 class CartsRecipeSerializer(ModelSerializer):
     """Сериализатор для работы корзины."""
-    id = serializers.IntegerField(source='recipe.id', required=False)
-    name = serializers.CharField(source='recipe.name', required=False)
+    id = serializers.IntegerField(
+        source='recipe.id', required=False
+    )
+    name = serializers.CharField(
+        source='recipe.name', required=False
+    )
     image = Base64ImageField(
         source='recipe.name',
         required=False, allow_null=True
@@ -277,44 +280,3 @@ class CartsRecipeSerializer(ModelSerializer):
             'image',
             'cooking_time',
         )
-
-    # def create(self, validated_data):
-    #     user = validated_data.pop('user')
-    #     recipe = validated_data.pop('recipe')
-    #     Carts.objects.get_or_create(
-    #         recipe=recipe,
-    #         user=user
-    #     )
-    #     return recipe
-# class CartsRecipeSerializer(ModelSerializer):
-#     """Сериализатор для работы корзины."""
-#     id = serializers.IntegerField(required=False)
-#     name = serializers.CharField(required=False)
-#     image = Base64ImageField(
-#         required=False, allow_null=True
-#     )
-#     cooking_time = serializers.IntegerField(required=False)
-
-#     class Meta:
-#         model = Recipe
-#         fields = (
-#             'id',
-#             'name',
-#             'image',
-#             'cooking_time',
-#         )
-#         read_only_fields = (
-#             'id',
-#             'name',
-#             'image',
-#             'cooking_time',
-#         )
-
-#     def create(self, validated_data):
-#         user = validated_data.pop('user')
-#         recipe = validated_data.pop('recipe')
-#         Carts.objects.get_or_create(
-#             recipe=recipe,
-#             user=user
-#         )
-#         return recipe
