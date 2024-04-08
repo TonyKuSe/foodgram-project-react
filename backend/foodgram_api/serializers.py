@@ -162,7 +162,7 @@ class RecipeSerializer(ModelSerializer):
 
 class RecipeSerializerList(ModelSerializer):
     """Сериализатор для выведения всех рецептов."""
-
+    id = serializers.IntegerField()
     author = UserSerializer(many=False)
     tags = TagSerializer(many=True)
     ingredients = SerializerMethodField()
