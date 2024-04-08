@@ -198,10 +198,10 @@ class RecipeSerializerList(ModelSerializer):
 
     def get_ingredients(self, recipe):
         return Ingredient.objects.all().filter(
-                recipe=recipe.id).values(
-                    'id', 'name', 'measurement_unit',
-                    amount=F('rec_ingredient__amount')
-                )
+            recipe=recipe.id).values(
+                'id', 'name', 'measurement_unit',
+                amount=F('rec_ingredient__amount')
+            )
 
     def get_is_favorited(self, recipe):
         user = self.context['request'].user
