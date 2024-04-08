@@ -30,15 +30,3 @@ class Limits(IntEnum):
     MIN_AMOUNT_INGREDIENTS = 1
     MAX_AMOUNT_INGREDIENTS = 32000
 
-
-class UrlQueries(str, Enum):
-    # Параметр для поиска ингридиентов по вхождению значения в название
-    SEARCH_ING_NAME = 'name'
-    # Параметр для поиска объектов в списке "избранное"
-    FAVORITE = 'is_favorited'
-    # Параметр для поиска объектов в списке "покупки"
-    SHOP_CART = 'is_in_shopping_cart'
-    # Параметр для поиска объектов по автору
-    AUTHOR = 'author'
-    # Параметр для поиска объектов по тэгам
-    TAGS = 'tags'
