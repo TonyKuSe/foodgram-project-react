@@ -45,25 +45,14 @@ class UserViewSet(DjoserUserViewSet):
 
     def get_object(self):
         id = self.kwargs.get('id')
-        return get_object_or_404(User, id=id)
+        obj = get_object_or_404(User, id=id) 
+        return obj 
+        # return get_object_or_404(User, id=id)
 
     def get_serializer_class(self):
         if self.action == 'retrieve' and self.request.data is not None: 
             return UserRetrieveSerializer
-        elif self.action == 'set_password': 
-
-            return UserSetPasswordSerializer 
-
-        elif self.action == 'me': 
-
-            return UserMeSerializer 
-
-        elif self.action == 'list': 
-
-            return UserRetrieveSerializer 
-
-        return UserSerializer
-        # return SERIALIZER_CLASSES.get(self.action, UserSerializer)
+        return SERIALIZER_CLASSES.get(self.action, UserSerializer)
 
     @action(
         detail=True,
