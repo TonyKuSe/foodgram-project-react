@@ -41,6 +41,8 @@ class UserViewSet(DjoserUserViewSet):
     def get_permissions(self):
         if self.action == 'retrieve':
             return [AllowAny()]
+        elif self.action == 'me':
+            return [IsAuthenticated()]
         return super().get_permissions()
 
     def get_object(self):
@@ -48,7 +50,7 @@ class UserViewSet(DjoserUserViewSet):
         return get_object_or_404(User, id=id)
 
     def get_serializer_class(self):
-        if self.action == 'retrieve' and self.request.data is not None: 
+        if self.action == 'retrieve' and self.request.data is not None:
             return UserRetrieveSerializer
         return SERIALIZER_CLASSES.get(self.action, UserSerializer)
 
