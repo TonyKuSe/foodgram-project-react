@@ -40,7 +40,7 @@ class UserViewSet(DjoserUserViewSet):
     filter_backends = (filters.SearchFilter,)
 
     def get_permissions(self):
-        if self.action == 'retrieve':
+        if self.action == 'retrieve' or 'list':
             return [AllowAny()]
         elif self.action == 'me':
             return [IsAuthenticated()]
