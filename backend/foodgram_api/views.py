@@ -27,9 +27,9 @@ User = get_user_model()
 
 
 SERIALIZER_CLASSES = {
-    'retrieve': UserRetrieveSerializer, 
-    'set_password': UserSetPasswordSerializer, 
-    'me': UserMeSerializer, 
+    'retrieve': UserRetrieveSerializer,
+    'set_password': UserSetPasswordSerializer,
+    'me': UserMeSerializer,
     'list': UserRetrieveSerializer,
 }
 
