@@ -206,13 +206,13 @@ class RecipeSerializerList(ModelSerializer):
         user = self.context['request'].user
         if user.is_anonymous:
             return False
-        return user.favorites.all().exists()
+        return user.favorites.filter(recipe=recipe).exists()
 
     def get_is_in_shopping_cart(self, recipe):
         user = self.context['request'].user
         if user.is_anonymous:
             return False
-        return user.carts.all().exists()
+        return user.carts.filter(recipe=recipe).exists()
 
 
 class FavoritRecipeSerializer(ModelSerializer):
