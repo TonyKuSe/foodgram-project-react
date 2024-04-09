@@ -27,7 +27,6 @@ User = get_user_model()
 
 
 SERIALIZER_CLASSES = {
-    'retrieve': UserRetrieveSerializer,
     'set_password': UserSetPasswordSerializer,
     'me': UserMeSerializer,
     'list': UserRetrieveSerializer,
@@ -49,6 +48,8 @@ class UserViewSet(DjoserUserViewSet):
         return get_object_or_404(User, id=id)
 
     def get_serializer_class(self):
+        if self.action == 'retrieve' and self.request.data is not None: 
+            return UserRetrieveSerializer 
         return SERIALIZER_CLASSES.get(self.action, UserSerializer)
 
     @action(
