@@ -109,18 +109,43 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 6,
 }
 
-DJOSER = {
-    'LOGIN_FIELD': 'email',
-    'HIDE_USERS': False,
-    'PERMISSIONS': {
-        'resipe': ('foodgram_api.permissions.IsAuthenticated,',),
-        'recipe_list': ('foodgram_api.permissions.AllowAny',),
-        'user': ('foodgram_api.permissions.AuthorStaffOrReadOnly',),
-        'user_list': ('foodgram_api.permissions.AllowAny',),
-        'subscribe': ('foodgram_api.permissions.IsAuthenticated',),
-        'subscriptions': ('foodgram_api.permissions.IsAuthenticated',),
-        'shopping_cart': ('foodgram_api.permissions.IsAuthenticated,',)
-    },
+# DJOSER = {
+#     'LOGIN_FIELD': 'email',
+#     'HIDE_USERS': False,
+#     'PERMISSIONS': {
+#         'resipe': ('foodgram_api.permissions.IsAuthenticated,',),
+#         'recipe_list': ('foodgram_api.permissions.AllowAny',),
+#         'user': ('foodgram_api.permissions.AuthorStaffOrReadOnly',),
+#         'user_list': ('foodgram_api.permissions.AllowAny',),
+#         'subscribe': ('foodgram_api.permissions.IsAuthenticated',),
+#         'subscriptions': ('foodgram_api.permissions.IsAuthenticated',),
+#         'shopping_cart': ('foodgram_api.permissions.IsAuthenticated,',)
+#     },
+# }
+DJOSER = { 
+
+    "LOGIN_FIELD": "email", 
+
+    "HIDE_USERS": False, 
+
+    "PERMISSIONS": { 
+
+        'resipe': ("foodgram_api.permissions.IsAuthenticated,",), 
+
+        'recipe_list': ("foodgram_api.permissions.AllowAny",), 
+
+        'user': ("foodgram_api.permissions.AuthorStaffOrReadOnly",), 
+
+        'user_list': ("foodgram_api.permissions.AllowAny",), 
+
+        'subscribe': ("foodgram_api.permissions.IsAuthenticated",), 
+
+        'subscriptions': ("foodgram_api.permissions.IsAuthenticated",), 
+
+        'shopping_cart': ("foodgram_api.permissions.IsAuthenticated,",) 
+
+    }, 
+
 }
 
 LANGUAGE_CODE = 'ru'

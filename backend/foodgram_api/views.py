@@ -45,9 +45,7 @@ class UserViewSet(DjoserUserViewSet):
 
     def get_object(self):
         id = self.kwargs.get('id')
-        obj = get_object_or_404(User, id=id) 
-        return obj 
-        # return get_object_or_404(User, id=id)
+        return get_object_or_404(User, id=id)
 
     def get_serializer_class(self):
         if self.action == 'retrieve' and self.request.data is not None: 
