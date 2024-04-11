@@ -4,7 +4,6 @@ from collections import OrderedDict
 from django.db.models import F
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
-
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
@@ -17,7 +16,7 @@ from users.serializers import UserSerializer
 
 User = get_user_model()
 
-
+    
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
@@ -97,9 +96,9 @@ class RecipeSerializer(ModelSerializer):
         )
 
     def get_ingredients(self, recipe):
-        return Ingredient.objects.all().filter(
-            recipe=recipe.id).values(
-            'id', 'name', 'measurement_unit',
+        return recipe.ingredients.values(
+            'id', 'name',
+            'measurement_unit',
             amount=F('rec_ingredient__amount')
         )
 
@@ -119,15 +118,6 @@ class RecipeSerializer(ModelSerializer):
         recipe_ingredients = []
         for ingredient in ingredients:
             amount = int(ingredient['amount'])
-            if (
-                amount < Limits.MIN_AMOUNT_INGREDIENTS
-                or amount > Limits.MAX_AMOUNT_INGREDIENTS
-            ):
-                raise ValueError(
-                    f'Значение amount должно быть от '
-                    f'{Limits.MIN_AMOUNT_INGREDIENTS} до '
-                    f'{Limits.MAX_AMOUNT_INGREDIENTS}.'
-                )
             recipe_ingredient = RecipeIngredient(
                 recipe=recipe,
                 ingredient_id=ingredient['id'],
@@ -197,10 +187,11 @@ class RecipeSerializerList(ModelSerializer):
         )
 
     def get_ingredients(self, recipe):
-        return Ingredient.objects.all().filter(
-            recipe=recipe.id).values(
-                'id', 'name', 'measurement_unit',
-                amount=F('rec_ingredient__amount'))
+        return recipe.ingredients.values(
+            'id', 'name',
+            'measurement_unit',
+            amount=F('rec_ingredient__amount')
+        )
 
     def get_is_favorited(self, recipe):
         user = self.context['request'].user

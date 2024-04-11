@@ -2,7 +2,6 @@ from django.http import HttpResponse
 from django.db.models.aggregates import Sum
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import status, viewsets, filters
@@ -182,10 +181,14 @@ class FavoritViewSet(viewsets.ModelViewSet):
     serializer_class = FavoritRecipeSerializer
     permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self):
-        recipe_id = self.kwargs.get('recipe_id')
-        return Favorites.objects.select_related(
-            'recipe', 'user').filter(recipe=recipe_id)
+    # def get_queryset(self):
+    #     recipe_id = self.kwargs.get('recipe_id')
+    #     x = Favorites.objects.select_related(
+    #         'recipe', 'user').filter(recipe=recipe_id)
+    #     z = recipe_id.favorites.all()
+    #     z=z
+    #     return Favorites.objects.select_related(
+    #         'recipe', 'user').filter(recipe=recipe_id)
 
     def perform_create(self, serializer):
         recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))
