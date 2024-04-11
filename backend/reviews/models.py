@@ -174,7 +174,7 @@ class Favorites(models.Model):
         return f"{self.user} -> {self.recipe}"
 
 
-class Carts(models.Model):
+class Cart(models.Model):
     """Рецепты в корзине покупок."""
 
     recipe = models.ForeignKey(

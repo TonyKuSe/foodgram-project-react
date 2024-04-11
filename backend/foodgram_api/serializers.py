@@ -9,14 +9,14 @@ from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from reviews.models import (Ingredient, Recipe,
                             Tag, RecipeIngredient,
-                            Favorites, Carts)
+                            Favorites, Cart)
 from reviews.enums import Limits
 from users.serializers import UserSerializer
 
 
 User = get_user_model()
 
-    
+
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
@@ -66,10 +66,12 @@ class RecIngredientSerializer(ModelSerializer):
         min_value=Limits.MIN_AMOUNT_INGREDIENTS,
         max_value=Limits.MAX_AMOUNT_INGREDIENTS
     )
+
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
         read_only_fields = ('id', 'name', 'measurement_unit')
+
 
 class RecipeSerializer(ModelSerializer):
     """Сериализатор для рецептов."""
@@ -106,13 +108,6 @@ class RecipeSerializer(ModelSerializer):
             'is_shopping_cart',
         )
 
-    def get_ingredients(self, recipe):
-        return recipe.ingredients.values(
-            'id', 'name',
-            'measurement_unit',
-            amount=F('rec_ingredient__amount')
-        )
-
     def get_is_favorited(self, recipe):
         user = self.context['request'].user
         if user.is_anonymous:
@@ -123,9 +118,9 @@ class RecipeSerializer(ModelSerializer):
         user = self.context['request'].user
         if user.is_anonymous:
             return False
-        return user.carts.filter(recipe=recipe).exists()
+        return user.cart.filter(recipe=recipe).exists()
 
-    def create_ingredients(self, recipe, ingredients,):
+    def create_ingredients(self, recipe, ingredients):
         recipe_ingredients = []
         for ingredient in ingredients:
             amount = int(ingredient['amount'])
@@ -198,7 +193,7 @@ class RecipeSerializerList(ModelSerializer):
         )
 
     def get_ingredients(self, recipe):
-        return recipe.ingredients.values(
+        return recipe.ingredient.values(
             'id', 'name',
             'measurement_unit',
             amount=F('rec_ingredient__amount')
@@ -250,7 +245,7 @@ class FavoritRecipeSerializer(ModelSerializer):
         )
 
 
-class CartsRecipeSerializer(ModelSerializer):
+class CartRecipeSerializer(ModelSerializer):
     """Сериализатор для работы корзины."""
     id = serializers.IntegerField(
         source='recipe.id', required=False
@@ -268,7 +263,7 @@ class CartsRecipeSerializer(ModelSerializer):
     )
 
     class Meta:
-        model = Carts
+        model = Cart
         fields = (
             'id',
             'name',

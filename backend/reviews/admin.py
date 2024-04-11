@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import (Favorites, Ingredient,
                      Recipe, RecipeIngredient,
-                     Carts, Tag)
+                     Cart, Tag)
 from users.models import Subscriptions
 
 EMPTY_MSG = '-пусто-'
@@ -85,7 +85,7 @@ class FavoritesAdmin(admin.ModelAdmin):
         return 'Некорректный формат рецепта'
 
 
-@admin.register(Carts)
+@admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'user', 'get_recipe')
