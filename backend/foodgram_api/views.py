@@ -181,14 +181,10 @@ class FavoritViewSet(viewsets.ModelViewSet):
     serializer_class = FavoritRecipeSerializer
     permission_classes = (IsAuthenticated,)
 
-    # def get_queryset(self):
-    #     recipe_id = self.kwargs.get('recipe_id')
-    #     x = Favorites.objects.select_related(
-    #         'recipe', 'user').filter(recipe=recipe_id)
-    #     z = recipe_id.favorites.all()
-    #     z=z
-    #     return Favorites.objects.select_related(
-    #         'recipe', 'user').filter(recipe=recipe_id)
+    def get_queryset(self):
+        recipe_id = self.kwargs.get('recipe_id')
+        return Favorites.objects.select_related(
+            'recipe', 'user').filter(recipe=recipe_id)
 
     def perform_create(self, serializer):
         recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))
@@ -221,8 +217,10 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
 
     @action(methods=('delete',), detail=True)
     def delete(self, request, *args, **kwargs):
-        recipe_id = self.kwargs.get('recipe_id')
-        instance = Carts.objects.select_related(
-            'recipe', 'user').filter(recipe=recipe_id)
+        # recipe_id = self.kwargs.get('recipe_id')
+        recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))
+        instance = recipe.carts.filter(user=self.request.user)
+        # instance = Carts.objects.select_related(
+        #     'recipe', 'user').filter(recipe=recipe_id)
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)

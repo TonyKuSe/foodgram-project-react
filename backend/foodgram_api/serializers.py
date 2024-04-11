@@ -60,12 +60,23 @@ class IngredientSerializer(ModelSerializer):
         read_only_fields = ('id', 'name', 'measurement_unit')
 
 
+class RecIngredientSerializer(ModelSerializer):
+    """Сериализатор для ингридиентов."""
+    amount = serializers.IntegerField(
+        min_value=Limits.MIN_AMOUNT_INGREDIENTS,
+        max_value=Limits.MAX_AMOUNT_INGREDIENTS
+    )
+    class Meta:
+        model = Ingredient
+        fields = ('id', 'name', 'measurement_unit', 'amount')
+        read_only_fields = ('id', 'name', 'measurement_unit')
+
 class RecipeSerializer(ModelSerializer):
     """Сериализатор для рецептов."""
 
     author = UserSerializer(many=False, required=False)
     tags = TagSerializer(many=True, read_only=True)
-    ingredients = SerializerMethodField()
+    ingredients = RecIngredientSerializer(many=True, required=False)
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
     image = Base64ImageField(
