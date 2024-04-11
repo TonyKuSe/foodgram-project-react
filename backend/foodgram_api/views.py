@@ -219,7 +219,7 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
     def delete(self, request, *args, **kwargs):
         # recipe_id = self.kwargs.get('recipe_id')
         recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))
-        instance = recipe.carts.filter(user=self.request.user)
+        instance = recipe.carts.filter()
         # instance = Carts.objects.select_related(
         #     'recipe', 'user').filter(recipe=recipe_id)
         self.perform_destroy(instance)
